@@ -4,7 +4,7 @@
 1号艇の勝敗を予測するプロジェクト
 
 
-boat_race_prediction/
+boatrace_boat1_prediction/
 │
 ├── data/
 │   ├── raw/
