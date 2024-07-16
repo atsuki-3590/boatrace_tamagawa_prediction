@@ -11,7 +11,9 @@ info_df = pd.read_csv(info_path)
 result_df = pd.read_csv(result_path, low_memory=False)
 
 merged_df = pd.merge(info_df, result_df, on='レースコード', how='left')
-columns_order = ['レースコード', '天気', '風向', '風速', '波の高さ', '決まり手'] + [col for col in merged_df.columns if col not in ['レースコード', '天気', '風向', '風速', '波の高さ', '決まり手']]
+
+# カラムの順番を指定
+columns_order = ['レースコード', 'レース場', '天気', '風向', '風速', '波の高さ', '距離', '決まり手'] + [col for col in merged_df.columns if col not in ['レースコード', '天気', '風向', '風速', '波の高さ', '決まり手']]
 merged_df = merged_df[columns_order]
 
 # print(merged_df.head())
