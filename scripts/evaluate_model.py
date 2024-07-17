@@ -1,23 +1,25 @@
-# モデルの評価
+import pickle
+from sklearn.metrics import classification_report
+import os
+import sys
 
-# サンプル
-import pandas as pd
-import joblib
-from sklearn.metrics import accuracy_score
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(script_dir)
+sys.path.append(os.path.join(project_root, 'utils'))
 
-def load_model(model_path):
-    return joblib.load(model_path)
+from data_loader import load_data
 
-def evaluate_model(model, X, y):
-    predictions = model.predict(X)
-    accuracy = accuracy_score(y, predictions)
-    return accuracy
 
-if __name__ == "__main__":
-    model = load_model('models/best_model.pkl')
-    df = pd.read_csv('data/processed/new_data.csv')
-    X = df.drop(columns=['target'])
-    y = df['target']
-    
-    accuracy = evaluate_model(model, X, y)
-    print(f'Model Accuracy: {accuracy}')
+# モデルのロード
+with open('models/best_model.pkl', 'rb') as model_file:
+    model = pickle.load(model_file)
+
+# データのロード
+X_test, y_test = load_data('data/processed/modified_data.csv')
+
+# 予測
+y_pred = model.predict(X_test)
+
+# 評価
+report = classification_report(y_test, y_pred)
+print(report)
