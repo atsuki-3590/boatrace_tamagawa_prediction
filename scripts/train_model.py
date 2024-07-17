@@ -1,40 +1,39 @@
 # モデルのトレーニング
-
-# サンプル
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
-import joblib
-import yaml
+from sklearn.metrics import accuracy_score, classification_report
+import pickle
 
-# 設定ファイルの読み込み
-with open('config/config.yaml', 'r') as file:
-    config = yaml.safe_load(file)
 
-# データの読み込み
-df = pd.read_csv(config['data']['processed_data_path'])
+modified_file_path = "data\processed\modified_data.csv"
+data = pd.read_csv(modified_file_path, low_memory=False)
 
-# 特徴量とターゲットの分割
-X = df.drop(columns=['target'])
-y = df['target']
+# 特徴量とターゲットに分ける
+X = data.drop(columns=['1号艇勝敗'])
+y = data['1号艇勝敗']
 
-# データの分割
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=config['model']['random_state'])
+# 訓練データとテストデータに分割
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# モデルの定義とトレーニング
-model = RandomForestClassifier(
-    n_estimators=config['model']['n_estimators'],
-    max_depth=config['model']['max_depth'],
-    random_state=config['model']['random_state']
-)
+# モデルの訓練
+model = RandomForestClassifier(random_state=42)
 model.fit(X_train, y_train)
 
-# 予測と評価
+# モデルの予測
 y_pred = model.predict(X_test)
+
+# モデルの評価
 accuracy = accuracy_score(y_test, y_pred)
-print(f'Model Accuracy: {accuracy}')
+report = classification_report(y_test, y_pred)
+
+accuracy, report
+
+print(f"accuracy:{accuracy}, report{report}")
+print("モデルのトレーニングが完了しました")
 
 # モデルの保存
-joblib.dump(model, 'models/best_model.pkl')
-print('Model saved to models/best_model.pkl')
+with open('models/best_model.pkl', 'wb') as model_file:
+    pickle.dump(model, model_file)
+
+print("モデルが保存されました")

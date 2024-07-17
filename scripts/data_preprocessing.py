@@ -1,13 +1,14 @@
 # データ前処理
 import os
 import pandas as pd
+from sklearn.preprocessing import LabelEncoder
 
 
 # ファイルパスを変数に格納
 raw_file_path = 'data/raw/merged_data.csv'
 processed_dir = 'data/processed/'
 
-modified_file_path = f"{processed_dir}modified_merged_data.csv"
+modified_file_path = f"{processed_dir}modified_data.csv"
 
 df = pd.read_csv(raw_file_path, low_memory=False)
 
@@ -35,9 +36,9 @@ new_data['1号艇勝敗'] = new_data['1着_艇番'].apply(lambda x: 1 if x == 1 
 
 
 # 欠損値の確認
-missing_values = data.isnull().sum()
+missing_values = new_data.isnull().sum()
 # カテゴリカルデータの確認
-categorical_columns = data.select_dtypes(include=['object']).columns
+categorical_columns = new_data.select_dtypes(include=['object']).columns
 
 
 
@@ -49,15 +50,16 @@ data_filtered = new_data[columns_to_keep]
 # 欠損値を含む行を削除
 data_filtered = data_filtered.dropna()
 
+label_encoders = {}
 # カテゴリカルデータのラベルエンコーディング
 for column in categorical_columns:
     if column in data_filtered.columns:
         le = LabelEncoder()
         data_filtered[column] = le.fit_transform(data_filtered[column].astype(str))
-
+        label_encoders[column] = le
 
 
 os.makedirs(processed_dir, exist_ok=True)
-new_data.to_csv(modified_file_path, index=False)
+data_filtered.to_csv(modified_file_path, index=False)
 
 print("データ前処理が完了しました")
