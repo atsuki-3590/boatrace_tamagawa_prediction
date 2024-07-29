@@ -4,14 +4,17 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report
 import pickle
+import matplotlib.pyplot as plt
+import japanize_matplotlib 
 
+japanize_matplotlib.japanize()
 
 modified_file_path = "data\processed\modified_data.csv"
 data = pd.read_csv(modified_file_path, low_memory=False)
 
 # 特徴量とターゲットに分ける
-X = data.drop(columns=['1号艇勝敗'])
-y = data['1号艇勝敗']
+X = data.drop(columns=['結果'])
+y = data['結果']
 
 # 訓練データとテストデータに分割
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -37,3 +40,27 @@ with open('models/best_model.pkl', 'wb') as model_file:
     pickle.dump(model, model_file)
 
 print("モデルが保存されました")
+
+
+
+# 特徴量の重要度を確認
+feature_importances = model.feature_importances_
+features = X.columns
+
+# データフレームにまとめる
+importance_df = pd.DataFrame({'特徴量': features, '重要度': feature_importances})
+
+# 重要度の高い順にソート
+importance_df = importance_df.sort_values(by='重要度', ascending=False)
+
+# 特徴量の重要度を表示
+print(importance_df)
+
+# 特徴量の重要度をプロット
+plt.figure(figsize=(12, 8))
+plt.barh(importance_df['特徴量'], importance_df['重要度'])
+plt.xlabel('重要度')
+plt.ylabel('特徴量')
+plt.title('特徴量の重要度')
+plt.gca().invert_yaxis()
+plt.show()
