@@ -9,12 +9,17 @@ import japanize_matplotlib
 
 japanize_matplotlib.japanize()
 
-modified_file_path = "data\processed\modified_data.csv"
+i = 1
+
+modified_file_path = f"data\processed\modified_data{i}.csv"
 data = pd.read_csv(modified_file_path, low_memory=False)
 
 # 特徴量とターゲットに分ける
-X = data.drop(columns=['結果'])
-y = data['結果']
+# X = data.drop(columns=['結果'])
+# y = data['結果']
+
+X = data.drop(columns=['3連複_結果'])
+y = data['3連複_結果']
 
 # 訓練データとテストデータに分割
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -35,11 +40,11 @@ accuracy, report
 print(f"accuracy:{accuracy}, report{report}")
 print("モデルのトレーニングが完了しました")
 
-# モデルの保存
-with open('models/best_model.pkl', 'wb') as model_file:
-    pickle.dump(model, model_file)
+# # モデルの保存
+# with open('models/best_model.pkl', 'wb') as model_file:
+#     pickle.dump(model, model_file)
 
-print("モデルが保存されました")
+# print("モデルが保存されました")
 
 
 

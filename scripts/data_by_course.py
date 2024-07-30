@@ -88,8 +88,20 @@ def transform_data(df):
 
     return transformed_df
 
-
 transformed_df = transform_data(new_data)
+
+
+# Zスコアカラムを追加
+def add_z_score(df, column):
+    mean = df.groupby('レースコード')[column].transform('mean')
+    std = df.groupby('レースコード')[column].transform('std')
+    df[f'{column}_Zスコア'] = (df[column] - mean) / std
+
+columns_to_add_z = ['全国勝率', '全国2連対率', '当地勝率', '当地2連対率', 'モーター2連対率', 'ボート2連対率']
+for column in columns_to_add_z:
+    add_z_score(transformed_df, column)
+
+
 
 os.makedirs(processed_dir, exist_ok=True)
 transformed_df.to_csv(modified_file_path, index=False)
@@ -98,12 +110,23 @@ print("データ前処理が完了しました")
 
 
 
-# 1号艇のデータのみ抽出
-boto1_df = transformed_df[transformed_df['枠'] == 1]
-boto1_file_path = f"{processed_dir}data_boto1.csv"
+# # 1号艇のデータのみ抽出
+# boto1_df = transformed_df[transformed_df['枠'] == 1]
+# boto1_file_path = f"{processed_dir}data_boto1.csv"
 
-# CSVファイルとして保存
-transformed_df.to_csv(modified_file_path, index=False)
-boto1_df.to_csv(boto1_file_path, index=False)
+# # CSVファイルとして保存
+# transformed_df.to_csv(modified_file_path, index=False)
+# boto1_df.to_csv(boto1_file_path, index=False)
 
-print("1号艇のデータを作成しました")
+# print("1号艇のデータを作成しました")
+
+
+for i in range(1, 7):
+    boto1_df = transformed_df[transformed_df['枠'] == i]
+    boto1_file_path = f"{processed_dir}data_boto{i}.csv"
+
+    # CSVファイルとして保存
+    transformed_df.to_csv(modified_file_path, index=False)
+    boto1_df.to_csv(boto1_file_path, index=False)
+
+    print(f"{i}号艇のデータを作成しました")
