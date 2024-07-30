@@ -26,7 +26,6 @@ columns_to_drop = [
     '1着_登録番号', '2着_登録番号', '3着_登録番号', '4着_登録番号', '5着_登録番号', '6着_登録番号',
     '1着_着順', '2着_着順', '3着_着順', '4着_着順', '5着_着順', '6着_着順', 
     '1着_選手名', '2着_選手名', '3着_選手名', '4着_選手名', '5着_選手名', '6着_選手名',
-    '1着_展示タイム', '2着_展示タイム', '3着_展示タイム', '4着_展示タイム', '5着_展示タイム', '6着_展示タイム',
     '1着_進入コース', '2着_進入コース', '3着_進入コース', '4着_進入コース', '5着_進入コース', '6着_進入コース', 
     '日次', 'レース日', '距離', '決まり手'
 ]
@@ -41,6 +40,30 @@ print("データ前処理を開始します")
 
 
 def transform_data(df):
+    # 展示タイムのカラムを特定し、数値型に変換
+    exhibition_time_columns = [col for col in df.columns if '展示タイム' in col]
+    for col in exhibition_time_columns:
+        df[col] = pd.to_numeric(df[col], errors='coerce')
+
+    # 'K .' を含む行を検出
+    mask = (df == 'K .').any(axis=1)
+    invalid_time_count = mask.sum()  # 'K .' を含む行の数をカウント
+    df = df[~mask]  # 'K .' を含む行を削除
+    
+    # NaNが含まれる行を削除する前のデータの行数
+    original_count = df.shape[0]
+    
+    # NaNが含まれる行を削除
+    df.dropna(inplace=True)
+
+    # NaNを含む行を削除した後の行数の差を計算
+    deleted_count = original_count - df.shape[0]
+    
+    # 'K .' を含む行数とNaNが含まれる行数を合計した削除行数を報告
+    total_deleted = deleted_count + invalid_time_count
+    print(f"合計 {total_deleted} 行が削除されました。")
+
+
     # 変換したデータを格納するリスト
     transformed_rows = []
     
@@ -71,24 +94,46 @@ def transform_data(df):
                 # '距離': row['距離'],
                 # '決まり手': row['決まり手'],
             })
-            # 順位と結果を設定
+            # one-hot-encodingで順位と結果を設定
             for j in range(1, 7):
                 if row[f'{j}着_艇番'] == i:
                     frame_data['順位'] = int(j)
                     frame_data['結果'] = int(1 if j == 1 else 0)
                     frame_data['3連複_結果'] = int(1 if j >= 1 and 3 >= j else 0)
+                    frame_data['展示タイム'] = row[f'{j}着_展示タイム']
                     break
 
             transformed_rows.append(frame_data)
 
     transformed_df = pd.DataFrame(transformed_rows)
     # columns_order = ['レースコード', 'レース場', 'レース回', '天気', '風向', '風速', '波の高さ', '距離', '決まり手', '枠', '体重', '級別', '全国勝率', '全国2連対率', '当地勝率', '当地2連対率', 'モーター2連対率', 'ボート2連対率', '順位', '結果']
-    columns_order = ['レースコード', 'レース場', 'レース回', '天気', '風向', '風速', '波の高さ', '枠', '体重', '級別', '全国勝率', '全国2連対率', '当地勝率', '当地2連対率', 'モーター2連対率', 'ボート2連対率', '順位', '結果', '3連複_結果']
+    columns_order = ['レースコード', 'レース場', 'レース回', '天気', '風向', '風速', '波の高さ', '枠', '体重', '級別', '全国勝率', '全国2連対率', '当地勝率', '当地2連対率', 'モーター2連対率', 'ボート2連対率', '展示タイム', '順位', '結果', '3連複_結果']
     transformed_df = transformed_df[columns_order]
 
     return transformed_df
 
 transformed_df = transform_data(new_data)
+
+print("コースごとのデータを作成しました")
+
+# 数値型に変換する対象カラムを指定
+columns_to_check = ['全国勝率', '全国2連対率', '当地勝率', '当地2連対率', 'モーター2連対率', 'ボート2連対率', '展示タイム']
+
+# 各カラムについて非数値データを探索
+for column in columns_to_check:
+    # 文字列を数値に変換し、変換できない場合はNaNに置き換える
+    temp_df = transformed_df[column].apply(pd.to_numeric, errors='coerce')
+    
+    # NaNが発生したデータ（元が非数値文字列）をフィルタリング
+    non_numeric_data = transformed_df[temp_df.isna()][column]
+    
+    # 非数値データがあればその一部を表示
+    if not non_numeric_data.empty:
+        print(f"カラム '{column}' に含まれる非数値データの一部:")
+        print(non_numeric_data.unique()[:10])  # 最初の10個のユニークな非数値エントリを表示
+    else:
+        print(f"カラム '{column}' には非数値データは含まれていません。")
+
 
 
 # Zスコアカラムを追加
@@ -97,7 +142,7 @@ def add_z_score(df, column):
     std = df.groupby('レースコード')[column].transform('std')
     df[f'{column}_Zスコア'] = (df[column] - mean) / std
 
-columns_to_add_z = ['全国勝率', '全国2連対率', '当地勝率', '当地2連対率', 'モーター2連対率', 'ボート2連対率']
+columns_to_add_z = ['全国勝率', '全国2連対率', '当地勝率', '当地2連対率', 'モーター2連対率', 'ボート2連対率', '展示タイム']
 for column in columns_to_add_z:
     add_z_score(transformed_df, column)
 
