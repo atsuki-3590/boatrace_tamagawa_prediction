@@ -7,7 +7,7 @@ print("データ前処理を開始します")
 
 # ファイルパスを変数に格納
 # raw_file_path = 'data/raw/merged_data.csv'
-processed_dir = 'data/processed/'
+# processed_dir = 'data/processed/'
 
 for i in range(1, 7):
     base_file_path = f"{processed_dir}data_boto{i}.csv"
