@@ -18,7 +18,7 @@ X, y = load_data("data/processed/modified_data.csv")
 _, X_test, _, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # モデルのロード
-with open('models/best_model.pkl', 'rb') as model_file:
+with open('models/boat1_model.pkl', 'rb') as model_file:
     model = pickle.load(model_file)
 
 # 予測
