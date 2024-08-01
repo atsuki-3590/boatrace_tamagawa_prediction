@@ -102,6 +102,21 @@ report              precision    recall  f1-score   support
 weighted avg       0.77      0.65      0.68      4660
 
 
+
+## LightGBM ハイパーパラメーターチューニング
+Best parameters found: {'boosting_type': 'gbdt', 'learning_rate': 0.1, 'n_estimators': 500, 'num_leaves': 70}
+
+accuracy: 0.7554172924265179
+report:               precision    recall  f1-score   support
+
+           0       0.32      0.25      0.28       896
+           1       0.83      0.88      0.85      3765
+
+    accuracy                           0.76      4661
+   macro avg       0.58      0.56      0.57      4661
+weighted avg       0.73      0.76      0.74      4661
+
+
 # 考察
 用語解説
 正確性（Accuracy）：モデルが全体的にどれだけ正確に予測できるかを示します。
@@ -127,6 +142,8 @@ Recallが高いほど、実際の1の結果を多めに捉える。そう考え�
 
 クラス0とクラス1の成績のバランスを取ることが重要な場合（つまり、1号艇が複勝しない場合の予測も重要視する場合）、2連率のみのモデルが適している。
 このモデルは、両クラスの成績が比較的均等であり、よりバランスの取れた予測を提供する。
+
+多く買ってたくさん的中を目指すか、絞って穴を狙うかに近い。
 
 
 
