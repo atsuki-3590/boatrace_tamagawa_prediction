@@ -79,7 +79,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 # モデルの訓練
 # model = RandomForestClassifier(random_state=42)
-model = lgb.LGBMClassifier(random_state=42)
+# model = lgb.LGBMClassifier(random_state=42)
 
 
 # # 通常
@@ -107,43 +107,58 @@ model = lgb.LGBMClassifier(random_state=42)
 # ハイパーパラメータチューニング
 sm = SMOTE(random_state=42)
 X_train_res, y_train_res = sm.fit_resample(X_train, y_train)
-model = lgb.LGBMClassifier(random_state=42, class_weight='balanced')
+
+
+# ランダムフォレスト
+model = RandomForestClassifier(random_state=42)
 param_grid = {
-    'num_leaves': [31, 50, 70],
-    'learning_rate': [0.01, 0.05, 0.1],
     'n_estimators': [100, 200, 500],
-    'boosting_type': ['gbdt', 'dart']
+    'max_features': ['auto', 'sqrt', 'log2'],
+    'max_depth': [4, 6, 8, 10, 12],
+    'criterion': ['gini', 'entropy']
 }
+
+
+# # LightGBM
+# model = lgb.LGBMClassifier(random_state=42, class_weight='balanced')
+# param_grid = {
+#     'num_leaves': [31, 50, 70],
+#     'learning_rate': [0.01, 0.05, 0.1],
+#     'n_estimators': [100, 200, 500],
+#     'boosting_type': ['gbdt', 'dart']
+# }
+
+
 
 grid_search = GridSearchCV(estimator=model, param_grid=param_grid, cv=3, scoring='accuracy', verbose=2, n_jobs=-1)
 grid_search.fit(X_train_res, y_train_res)
 
+# 最適なハイパーパラメーターを取得
+best_params = grid_search.best_params_
+print(f"Best parameters found: {best_params}")
+
+# 最適なハイパーパラメーターを用いてモデルをフィッティング
 best_model = grid_search.best_estimator_
-
-
+print("モデルのフィッティングが完了しました")
 
 # モデルの予測
-y_pred = model.predict(X_test)
+y_pred = best_model.predict(X_test)
 
 # モデルの評価
 accuracy = accuracy_score(y_test, y_pred)
 report = classification_report(y_test, y_pred)
 
-accuracy, report
-
-print(f"accuracy:{accuracy}, report{report}")
-print("モデルのトレーニングが完了しました")
+print(f"accuracy: {accuracy}")
+print(f"report: {report}")
 
 # モデルの保存
 with open('models/boat1_model.pkl', 'wb') as model_file:
-    pickle.dump(model, model_file)
+    pickle.dump(best_model, model_file)  # best_modelを保存
 
 print("モデルが保存されました")
 
-
-
 # 特徴量の重要度を確認
-feature_importances = model.feature_importances_
+feature_importances = best_model.feature_importances_  # best_modelを使用
 features = X.columns
 
 # データフレームにまとめる
@@ -164,12 +179,8 @@ plt.title('特徴量の重要度')
 plt.gca().invert_yaxis()
 plt.show()
 
-
-
-from sklearn.metrics import roc_curve, auc
-import matplotlib.pyplot as plt
-
-y_prob = model.predict_proba(X_test)[:, 1]  # 二値分類の場合、陽性クラス（1）の確率
+# ROC曲線のプロット
+y_prob = best_model.predict_proba(X_test)[:, 1]  # 二値分類の場合、陽性クラス（1）の確率
 fpr, tpr, thresholds = roc_curve(y_test, y_prob)
 roc_auc = auc(fpr, tpr)
 plt.figure()
