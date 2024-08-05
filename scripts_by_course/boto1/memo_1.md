@@ -5,15 +5,84 @@ test_size=0.2, random_state=42
 
 
 ## 通常時
-accuracy:0.808624758635486, 
-report              precision    recall  f1-score   support
+Custom_threshold: 0.8
+Accuracy: 0.6369877708646213
+AUC Score: 0.6678638730321885
+Classification Report:
+              precision    recall  f1-score   support
 
-           0       0.52      0.07      0.13       896
-           1       0.82      0.98      0.89      3765
+           0       0.28      0.60      0.38       860
+           1       0.88      0.65      0.74      3801
+
+    accuracy                           0.64      4661
+   macro avg       0.58      0.62      0.56      4661
+weighted avg       0.77      0.64      0.68      4661
+
+Custom_threshold: 0.7
+Accuracy: 0.742544518343703
+AUC Score: 0.6678638730321885
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.32      0.35      0.34       860
+           1       0.85      0.83      0.84      3801
+
+    accuracy                           0.74      4661
+   macro avg       0.59      0.59      0.59      4661
+weighted avg       0.75      0.74      0.75      4661
+
+Custom_threshold: 0.65
+Accuracy: 0.777944647071444
+AUC Score: 0.6678638730321885
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.35      0.24      0.29       860
+           1       0.84      0.90      0.87      3801
+
+    accuracy                           0.78      4661
+   macro avg       0.60      0.57      0.58      4661
+weighted avg       0.75      0.78      0.76      4661
+
+Custom_threshold: 0.6
+Accuracy: 0.794250160909676
+AUC Score: 0.6678638730321885
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.37      0.16      0.22       860
+           1       0.83      0.94      0.88      3801
+
+    accuracy                           0.79      4661
+   macro avg       0.60      0.55      0.55      4661
+weighted avg       0.75      0.79      0.76      4661
+
+Custom_threshold: 0.5
+Accuracy: 0.8088393048701995
+AUC Score: 0.6678638730321885
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.37      0.05      0.09       860
+           1       0.82      0.98      0.89      3801
 
     accuracy                           0.81      4661
-   macro avg       0.67      0.53      0.51      4661
-weighted avg       0.76      0.81      0.75      4661
+   macro avg       0.60      0.52      0.49      4661
+weighted avg       0.74      0.81      0.74      4661
+
+Custom_threshold: 0.4
+Accuracy: 0.8148465994421797
+AUC Score: 0.6678638730321885
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.44      0.01      0.02       860
+           1       0.82      1.00      0.90      3801
+
+    accuracy                           0.81      4661
+   macro avg       0.63      0.50      0.46      4661
+weighted avg       0.75      0.81      0.74      4661
+
 
 
 2連対率あり

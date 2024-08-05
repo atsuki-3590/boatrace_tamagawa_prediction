@@ -11,7 +11,7 @@ import japanize_matplotlib
 
 japanize_matplotlib.japanize()
 
-modified_file_path = f"data\processed\modified_data2.csv"
+modified_file_path = f"data\processed\modified_data4.csv"
 data = pd.read_csv(modified_file_path, low_memory=False)
 
 # 特徴量とターゲットに分ける
@@ -53,7 +53,7 @@ model.fit(X_train, y_train)
 
 
 # カスタム閾値の設定
-custom_threshold = 0.40  # ここでカスタム閾値を設定します
+custom_threshold = 0.30  # ここでカスタム閾値を設定します
 
 # モデルの予測
 y_pred_proba = model.predict_proba(X_test)[:, 1]
@@ -69,8 +69,9 @@ print(f"Accuracy: {accuracy}")
 print(f"AUC Score: {auc_score}")
 print(f"Classification Report: \n{report}")
 print("モデルのトレーニングが完了しました")
+
 # モデルの保存
-with open('models/boat2_model_1.pkl', 'wb') as model_file:
+with open('models/boat4_model_1.pkl', 'wb') as model_file:
     pickle.dump(model, model_file)
 
 print("モデルが保存されました")
