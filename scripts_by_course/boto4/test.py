@@ -7,7 +7,7 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, roc_auc_score, roc_curve, auc
 from imblearn.over_sampling import SMOTE
 from imblearn.under_sampling import RandomUnderSampler
 import pickle
@@ -22,8 +22,8 @@ print("データ前処理を開始します")
 processed_dir = 'data/processed/'
 
 
-base_file_path = f"{processed_dir}data_boto1.csv"
-# modified_file_path = f"{processed_dir}modified_data1.csv"
+base_file_path = f"{processed_dir}data_boto4.csv"
+# modified_file_path = f"{processed_dir}modified_data2.csv"
 
 df = pd.read_csv(base_file_path, low_memory=False)
 
@@ -77,23 +77,21 @@ y = data['3連複_結果']
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)   # シャッフルなし
 
-
 # モデルの訓練
 model = RandomForestClassifier(random_state=42)
+
+
+# 通常
 model.fit(X_train, y_train)
 
 
-# # 通常
-# model.fit(X_train, y_train)
-
-
-# オーバーサンプリング
-# SMOTEのインスタンス化
-sm = SMOTE(random_state=42)
-# 訓練データの再サンプリング
-X_train_res, y_train_res = sm.fit_resample(X_train, y_train)
-# モデルの訓練（再サンプリング後のデータを使用）
-model.fit(X_train_res, y_train_res)
+# # オーバーサンプリング
+# # SMOTEのインスタンス化
+# sm = SMOTE(random_state=42)
+# # 訓練データの再サンプリング
+# X_train_res, y_train_res = sm.fit_resample(X_train, y_train)
+# # モデルの訓練（再サンプリング後のデータを使用）
+# model.fit(X_train_res, y_train_res)
 
 
 # # アンダーサンプリング
@@ -106,7 +104,7 @@ model.fit(X_train_res, y_train_res)
 
 
 # カスタム閾値の設定
-custom_threshold = 0.80  # ここでカスタム閾値を設定します
+custom_threshold = 0.40  # ここでカスタム閾値を設定します
 
 # モデルの予測
 y_pred_proba = model.predict_proba(X_test)[:, 1]
@@ -124,12 +122,10 @@ print(f"Classification Report: \n{report}")
 print("モデルのトレーニングが完了しました")
 
 # モデルの保存
-with open('models/boat1_model.pkl', 'wb') as model_file:
+with open('models/boat4_model.pkl', 'wb') as model_file:
     pickle.dump(model, model_file)
 
 print("モデルが保存されました")
-
-
 
 # 特徴量の重要度を確認
 feature_importances = model.feature_importances_
@@ -153,13 +149,8 @@ plt.title('特徴量の重要度')
 plt.gca().invert_yaxis()
 plt.show()
 
-
-
-from sklearn.metrics import roc_curve, auc
-import matplotlib.pyplot as plt
-
-y_prob = model.predict_proba(X_test)[:, 1]  # 二値分類の場合、陽性クラス（1）の確率
-fpr, tpr, thresholds = roc_curve(y_test, y_prob)
+# ROC曲線をプロットして最適な閾値を確認（任意）
+fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
 roc_auc = auc(fpr, tpr)
 plt.figure()
 
@@ -169,6 +160,6 @@ plt.xlim([0.0, 1.0])
 plt.ylim([0.0, 1.05])
 plt.xlabel('偽陽性率')
 plt.ylabel('真陽性率')
-plt.title('1号艇勝率の特性曲線')
+plt.title('2号艇勝率の特性曲線')
 plt.legend(loc="lower right")
 plt.show()
