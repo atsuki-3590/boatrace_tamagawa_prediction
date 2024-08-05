@@ -74,10 +74,13 @@ X = data.drop(columns=['3連複_結果'])
 y = data['3連複_結果']
 
 # 訓練データとテストデータに分割
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)   # シャッフルなし
+
 
 # モデルの訓練
 model = RandomForestClassifier(random_state=42)
+model.fit(X_train, y_train)
 
 
 # # 通常
@@ -102,16 +105,22 @@ model.fit(X_train_res, y_train_res)
 # model.fit(X_train_res, y_train_res)
 
 
+# カスタム閾値の設定
+custom_threshold = 0.80  # ここでカスタム閾値を設定します
+
 # モデルの予測
-y_pred = model.predict(X_test)
+y_pred_proba = model.predict_proba(X_test)[:, 1]
+y_pred = (y_pred_proba >= custom_threshold).astype(int)  # カスタム閾値を使用して予測
 
 # モデルの評価
 accuracy = accuracy_score(y_test, y_pred)
 report = classification_report(y_test, y_pred)
+auc_score = roc_auc_score(y_test, y_pred_proba)
 
-accuracy, report
-
-print(f"accuracy:{accuracy}, report{report}")
+print(f"Custom_threshold: {custom_threshold}")
+print(f"Accuracy: {accuracy}")
+print(f"AUC Score: {auc_score}")
+print(f"Classification Report: \n{report}")
 print("モデルのトレーニングが完了しました")
 
 # モデルの保存
