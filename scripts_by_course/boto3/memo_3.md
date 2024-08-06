@@ -47,7 +47,35 @@ Classification Report:
 weighted avg       0.61      0.57      0.47      4661
 
 
-2連対率あり
+### 勝率あり、2連対率あり
+Custom_threshold: 0.5
+Accuracy: 0.6171673819742489
+AUC Score: 0.6490861432587262
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.60      0.52      0.56      2155
+           1       0.63      0.70      0.66      2505
+
+    accuracy                           0.62      4660
+   macro avg       0.61      0.61      0.61      4660
+weighted avg       0.62      0.62      0.61      4660
+
+
+Custom_threshold: 0.4
+Accuracy: 0.6
+AUC Score: 0.6490861432587262
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.64      0.30      0.41      2155
+           1       0.59      0.86      0.70      2505
+
+    accuracy                           0.60      4660
+   macro avg       0.62      0.58      0.55      4660
+weighted avg       0.61      0.60      0.57      4660
+
+
 
 
 
@@ -61,18 +89,44 @@ Zスコア無し、2連対率無し
 
 
 ## オーバーサンプリング
+### 勝率あり、2連対率なし
+Custom_threshold: 0.5
+Accuracy: 0.609525852821283
+AUC Score: 0.6441606501704494
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.58      0.57      0.57      2155
+           1       0.63      0.65      0.64      2506
+
+    accuracy                           0.61      4661
+   macro avg       0.61      0.61      0.61      4661
+weighted avg       0.61      0.61      0.61      4661
 
 
 
-2連対率
+### 勝率あり、2連対率あり
 
 
 
 ## アンダーサンプリング
+### 勝率あり、2連対率なし
+Custom_threshold: 0.5
+Accuracy: 0.6075949367088608
+AUC Score: 0.6418100040181985
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.57      0.59      0.58      2155
+           1       0.64      0.62      0.63      2506
+
+    accuracy                           0.61      4661
+   macro avg       0.61      0.61      0.61      4661
+weighted avg       0.61      0.61      0.61      4661
 
 
 
-2連対率あり
+### 勝率あり、2連対率あり
 
 
 

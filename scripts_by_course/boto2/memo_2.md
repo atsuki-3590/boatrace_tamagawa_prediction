@@ -5,6 +5,7 @@ test_size=0.2, random_state=42
 
 
 ## 通常時
+### 勝率あり、2連対率なし
 Custom_threshold: 0.5
 Accuracy: 0.6172495172709719
 AUC Score: 0.6501732421989389
@@ -32,19 +33,19 @@ Classification Report:
 weighted avg       0.61      0.60      0.54      4661
 
 
-2連対率あり
-Accuracy: 0.6070815450643777
+### 勝率あり、2連対率あり
+Custom_threshold: 0.4
+Accuracy: 0.601931330472103
+AUC Score: 0.6463324463135153
 Classification Report:
               precision    recall  f1-score   support
 
-           0       0.56      0.44      0.49      2007
-           1       0.63      0.74      0.68      2653
+           0       0.61      0.20      0.31      2007
+           1       0.60      0.90      0.72      2653
 
-    accuracy                           0.61      4660
-   macro avg       0.59      0.59      0.59      4660
-weighted avg       0.60      0.61      0.60      4660
-
-AUC Score: 0.6463324463135153
+    accuracy                           0.60      4660
+   macro avg       0.61      0.55      0.51      4660
+weighted avg       0.61      0.60      0.54      4660
 
 
 勝率無し、2連率あり
@@ -57,18 +58,43 @@ Zスコア無し、2連対率無し
 
 
 ## オーバーサンプリング
+### 勝率あり、2連対率なし
+Custom_threshold: 0.4
+Accuracy: 0.6063076593005793
+AUC Score: 0.6471337604726214
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.58      0.32      0.41      2008
+           1       0.62      0.82      0.70      2653
+
+    accuracy                           0.61      4661
+   macro avg       0.60      0.57      0.56      4661
+weighted avg       0.60      0.61      0.58      4661
 
 
-
-2連対率
+### 勝率あり、2連対率あり
 
 
 
 ## アンダーサンプリング
+### 勝率あり、2連対率なし
+Custom_threshold: 0.4
+Accuracy: 0.6127440463419866
+AUC Score: 0.6490576517901255
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.58      0.35      0.44      2008
+           1       0.62      0.81      0.71      2653
+
+    accuracy                           0.61      4661
+   macro avg       0.60      0.58      0.57      4661
+weighted avg       0.61      0.61      0.59      4661
 
 
 
-2連対率あり
+### 勝率あり、2連対率あり
 
 
 
