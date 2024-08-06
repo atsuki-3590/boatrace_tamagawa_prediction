@@ -39,7 +39,7 @@ columns_to_drop_place = [
     , '全国2連対率', '当地2連対率'
     # , '全国勝率_Zスコア', '全国2連対率_Zスコア', 'モーター2連対率_Zスコア', 'ボート2連対率_Zスコア', '当地2連対率_Zスコア', '当地勝率_Zスコア', '展示タイム_Zスコア'
     # , '全国勝率_Zスコア', '当地勝率_Zスコア'
-    ,'全国2連対率_Zスコア', '当地2連対率_Zスコア'
+    # ,'全国2連対率_Zスコア', '当地2連対率_Zスコア'
 ]
 
 
@@ -104,7 +104,7 @@ model.fit(X_train, y_train)
 
 
 # カスタム閾値の設定
-custom_threshold = 0.40  # ここでカスタム閾値を設定します
+custom_threshold = 0.60  # ここでカスタム閾値を設定します
 
 # モデルの予測
 y_pred_proba = model.predict_proba(X_test)[:, 1]
@@ -140,26 +140,26 @@ importance_df = importance_df.sort_values(by='重要度', ascending=False)
 # 特徴量の重要度を表示
 print(importance_df)
 
-# 特徴量の重要度をプロット
-plt.figure(figsize=(12, 8))
-plt.barh(importance_df['特徴量'], importance_df['重要度'])
-plt.xlabel('重要度')
-plt.ylabel('特徴量')
-plt.title('特徴量の重要度')
-plt.gca().invert_yaxis()
-plt.show()
+# # 特徴量の重要度をプロット
+# plt.figure(figsize=(12, 8))
+# plt.barh(importance_df['特徴量'], importance_df['重要度'])
+# plt.xlabel('重要度')
+# plt.ylabel('特徴量')
+# plt.title('特徴量の重要度')
+# plt.gca().invert_yaxis()
+# plt.show()
 
 # ROC曲線をプロットして最適な閾値を確認（任意）
 fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
 roc_auc = auc(fpr, tpr)
-plt.figure()
+# plt.figure()
 
-plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
-plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
-plt.xlim([0.0, 1.0])
-plt.ylim([0.0, 1.05])
-plt.xlabel('偽陽性率')
-plt.ylabel('真陽性率')
-plt.title('2号艇勝率の特性曲線')
-plt.legend(loc="lower right")
-plt.show()
+# plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
+# plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+# plt.xlim([0.0, 1.0])
+# plt.ylim([0.0, 1.05])
+# plt.xlabel('偽陽性率')
+# plt.ylabel('真陽性率')
+# plt.title('2号艇勝率の特性曲線')
+# plt.legend(loc="lower right")
+# plt.show()
