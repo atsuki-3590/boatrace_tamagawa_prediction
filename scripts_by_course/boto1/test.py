@@ -7,7 +7,7 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, roc_auc_score, roc_curve, auc
 from imblearn.over_sampling import SMOTE
 from imblearn.under_sampling import RandomUnderSampler
 import pickle
@@ -39,7 +39,7 @@ columns_to_drop_place = [
     , '全国2連対率', '当地2連対率'
     # , '全国勝率_Zスコア', '全国2連対率_Zスコア', 'モーター2連対率_Zスコア', 'ボート2連対率_Zスコア', '当地2連対率_Zスコア', '当地勝率_Zスコア', '展示タイム_Zスコア'
     # , '全国勝率_Zスコア', '当地勝率_Zスコア'
-    ,'全国2連対率_Zスコア', '当地2連対率_Zスコア'
+    # ,'全国2連対率_Zスコア', '当地2連対率_Zスコア'
 ]
 
 
@@ -80,20 +80,19 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle
 
 # モデルの訓練
 model = RandomForestClassifier(random_state=42)
-model.fit(X_train, y_train)
 
 
 # # 通常
-# model.fit(X_train, y_train)
+model.fit(X_train, y_train)
 
 
-# オーバーサンプリング
-# SMOTEのインスタンス化
-sm = SMOTE(random_state=42)
-# 訓練データの再サンプリング
-X_train_res, y_train_res = sm.fit_resample(X_train, y_train)
-# モデルの訓練（再サンプリング後のデータを使用）
-model.fit(X_train_res, y_train_res)
+# # オーバーサンプリング
+# # SMOTEのインスタンス化
+# sm = SMOTE(random_state=42)
+# # 訓練データの再サンプリング
+# X_train_res, y_train_res = sm.fit_resample(X_train, y_train)
+# # モデルの訓練（再サンプリング後のデータを使用）
+# model.fit(X_train_res, y_train_res)
 
 
 # # アンダーサンプリング
@@ -106,7 +105,7 @@ model.fit(X_train_res, y_train_res)
 
 
 # カスタム閾値の設定
-custom_threshold = 0.80  # ここでカスタム閾値を設定します
+custom_threshold = 0.45  # ここでカスタム閾値を設定します
 
 # モデルの予測
 y_pred_proba = model.predict_proba(X_test)[:, 1]
@@ -144,14 +143,14 @@ importance_df = importance_df.sort_values(by='重要度', ascending=False)
 # 特徴量の重要度を表示
 print(importance_df)
 
-# 特徴量の重要度をプロット
-plt.figure(figsize=(12, 8))
-plt.barh(importance_df['特徴量'], importance_df['重要度'])
-plt.xlabel('重要度')
-plt.ylabel('特徴量')
-plt.title('特徴量の重要度')
-plt.gca().invert_yaxis()
-plt.show()
+# # 特徴量の重要度をプロット
+# plt.figure(figsize=(12, 8))
+# plt.barh(importance_df['特徴量'], importance_df['重要度'])
+# plt.xlabel('重要度')
+# plt.ylabel('特徴量')
+# plt.title('特徴量の重要度')
+# plt.gca().invert_yaxis()
+# plt.show()
 
 
 
@@ -161,14 +160,14 @@ import matplotlib.pyplot as plt
 y_prob = model.predict_proba(X_test)[:, 1]  # 二値分類の場合、陽性クラス（1）の確率
 fpr, tpr, thresholds = roc_curve(y_test, y_prob)
 roc_auc = auc(fpr, tpr)
-plt.figure()
+# plt.figure()
 
-plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
-plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
-plt.xlim([0.0, 1.0])
-plt.ylim([0.0, 1.05])
-plt.xlabel('偽陽性率')
-plt.ylabel('真陽性率')
-plt.title('1号艇勝率の特性曲線')
-plt.legend(loc="lower right")
-plt.show()
+# plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
+# plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+# plt.xlim([0.0, 1.0])
+# plt.ylim([0.0, 1.05])
+# plt.xlabel('偽陽性率')
+# plt.ylabel('真陽性率')
+# plt.title('1号艇勝率の特性曲線')
+# plt.legend(loc="lower right")
+# plt.show()

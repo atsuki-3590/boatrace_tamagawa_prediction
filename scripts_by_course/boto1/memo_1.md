@@ -85,31 +85,50 @@ weighted avg       0.75      0.81      0.74      4661
 
 
 
-2連対率あり
-accuracy:0.8098712446351931, 
-report              precision    recall  f1-score   support
+### 2連対率あり
+Custom_threshold: 0.5
+Accuracy: 0.8107296137339056
+AUC Score: 0.6720058139534882
+Classification Report:
+              precision    recall  f1-score   support
 
-           0       0.50      0.07      0.13       887
-           1       0.82      0.98      0.89      3773
+           0       0.39      0.05      0.09       860
+           1       0.82      0.98      0.89      3800
 
     accuracy                           0.81      4660
-   macro avg       0.66      0.53      0.51      4660
-weighted avg       0.76      0.81      0.75      4660
+   macro avg       0.61      0.52      0.49      4660
+weighted avg       0.74      0.81      0.75      4660
+
+Custom_threshold: 0.4
+Accuracy: 0.8154506437768241
+AUC Score: 0.6720058139534882
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.50      0.01      0.03       860
+           1       0.82      1.00      0.90      3800
+
+    accuracy                           0.82      4660
+   macro avg       0.66      0.51      0.46      4660
+weighted avg       0.76      0.82      0.74      4660
 
 
-勝率無し、2連率あり
-accuracy:0.7407725321888412, 
-report              precision    recall  f1-score   support
+### 勝率無し、2連率あり
+Custom_threshold: 0.5
+Accuracy: 0.8105150214592275
+AUC Score: 0.6656814565483475
+Classification Report: 
+              precision    recall  f1-score   support
 
-           0       0.32      0.34      0.33       887
-           1       0.84      0.84      0.84      3773
+           0       0.40      0.06      0.10       860
+           1       0.82      0.98      0.89      3800
 
-    accuracy                           0.74      4660
-   macro avg       0.58      0.59      0.58      4660
-weighted avg       0.74      0.74      0.74      4660
+    accuracy                           0.81      4660
+   macro avg       0.61      0.52      0.50      4660
+weighted avg       0.74      0.81      0.75      4660
 
 
-Zスコア無し、2連対率無し
+### Zスコア無し、2連対率無し
 accuracy:0.7752321981424148, 
 report              precision    recall  f1-score   support
 
@@ -123,52 +142,67 @@ weighted avg       0.74      0.78      0.75      4845
 
 
 ## オーバーサンプリング
-accuracy:0.7275262819137525, 
-report              precision    recall  f1-score   support
+### 勝率あり、2連対率なし
+Custom_threshold: 0.5
+Accuracy: 0.7466208968032612
+AUC Score: 0.6589587807370153
+Classification Report:
+              precision    recall  f1-score   support
 
-           0       0.30      0.32      0.31       896
-           1       0.84      0.82      0.83      3765
+           0       0.32      0.32      0.32       860
+           1       0.85      0.84      0.84      3801
 
-    accuracy                           0.73      4661
-   macro avg       0.57      0.57      0.57      4661
-weighted avg       0.73      0.73      0.73      4661
+    accuracy                           0.75      4661
+   macro avg       0.58      0.58      0.58      4661
+weighted avg       0.75      0.75      0.75      4661
 
 
-2連対率
-accuracy:0.7369098712446351, 
-report              precision    recall  f1-score   support
+### 勝率あり、2連対率あり
+Custom_threshold: 0.5
+Accuracy: 0.7405579399141631
+AUC Score: 0.6616329559363525
+Classification Report:
+              precision    recall  f1-score   support
 
-           0       0.32      0.35      0.34       887
-           1       0.84      0.83      0.84      3773
+           0       0.31      0.33      0.32       860
+           1       0.85      0.83      0.84      3800
 
     accuracy                           0.74      4660
-   macro avg       0.58      0.59      0.59      4660
-weighted avg       0.74      0.74      0.74      4660
+   macro avg       0.58      0.58      0.58      4660
+weighted avg       0.75      0.74      0.74      4660
 
 
 
 ## アンダーサンプリング
-accuracy:0.6311950225273546, 
-report              precision    recall  f1-score   support
+### 勝率あり、2連対率なし
+Custom_threshold: 0.5
+Accuracy: 0.6532932847028534
+AUC Score: 0.6756358485832982
+Classification Report:
+              precision    recall  f1-score   support
 
-           0       0.29      0.62      0.39       896
-           1       0.88      0.63      0.74      3765
+           0       0.29      0.60      0.39       860
+           1       0.88      0.66      0.76      3801
 
-    accuracy                           0.63      4661
-   macro avg       0.58      0.63      0.56      4661
-weighted avg       0.76      0.63      0.67      4661
+    accuracy                           0.65      4661
+   macro avg       0.59      0.63      0.57      4661
+weighted avg       0.77      0.65      0.69      4661
 
 
-2連対率あり
-accuracy:0.6454935622317597, 
-report              precision    recall  f1-score   support
+### 勝率あり、2連対率あり
+Custom_threshold: 0.5
+Accuracy: 0.6592274678111588
+AUC Score: 0.6762711138310894
+Classification Report:
+              precision    recall  f1-score   support
 
-           0       0.29      0.61      0.40       887
-           1       0.88      0.65      0.75      3773
+           0       0.29      0.61      0.40       860
+           1       0.88      0.67      0.76      3800
 
-    accuracy                           0.65      4660
-   macro avg       0.58      0.63      0.57      4660
-weighted avg       0.77      0.65      0.68      4660
+    accuracy                           0.66      4660
+   macro avg       0.59      0.64      0.58      4660
+weighted avg       0.77      0.66      0.70      4660
+
 
 
 
