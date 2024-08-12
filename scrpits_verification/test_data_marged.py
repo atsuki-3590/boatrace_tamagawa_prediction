@@ -38,11 +38,16 @@ for idx, file_path in enumerate(result_file_paths, start=1):
 results_df = reduce(lambda left, right: pd.merge(left, right, on='レースコード', how='outer'), result_data_frames)
 
 # Predictions と Results の結合
-final_df = pd.merge(predictions_df, results_df, on='レースコード', how='inner')
+predictions_df = pd.merge(predictions_df, results_df, on='レースコード', how='inner')
 
 # オッズデータの追加
 odds_data = pd.read_csv('data/raw/odds_3f.csv')
-final_df = pd.merge(final_df, odds_data, on='レースコード', how='inner')
+final_df = pd.merge(predictions_df, odds_data, on='レースコード', how='inner')
+
+result_columns = [f'result_{i}' for i in range(1, 7)]
+final_df['result'] = final_df[result_columns].apply(lambda row: '='.join([str(i+1) for i, val in enumerate(row) if val == 1]), axis=1)
+
+final_df.drop(columns=result_columns, inplace=True)
 
 output_path = "test_predict_with_odds.csv"
 final_df.to_csv(f"data/processed/{output_path}", index=False)
