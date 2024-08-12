@@ -21,7 +21,8 @@ columns_to_drop = [
 ]
 
 columns_to_drop_place = [
-    'レースコード', '枠', '順位', '結果', '天気', '体重'
+    # 'レースコード', 
+    '枠', '順位', '結果', '天気', '体重'
     , '全国勝率', '全国2連対率', 'モーター2連対率', 'ボート2連対率', '当地2連対率', '当地勝率', '全国2連対率_Zスコア', '当地2連対率_Zスコア', '展示タイム'
 ]
 
@@ -35,6 +36,7 @@ new_data = df.drop(columns=columns_to_drop_place)  # 3連対率
 missing_values = new_data.isnull().sum()
 # カテゴリカルデータの確認
 categorical_columns = new_data.select_dtypes(include=['object']).columns
+categorical_columns = categorical_columns.drop('レースコード')
 
 # 欠損値を含む行を削除
 data_filtered = new_data.dropna()
