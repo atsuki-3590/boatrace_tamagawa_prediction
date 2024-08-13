@@ -53,6 +53,7 @@ def preprocess_boto_data(boat_number):
 
     print(f"{boat_number}号艇のデータ前処理が完了しました")
 
+
 # すべてのボートのデータを処理する
 for i in range(1, 7):
     preprocess_boto_data(i)
