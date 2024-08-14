@@ -18,7 +18,7 @@ data = pd.read_csv(modified_file_path, low_memory=False)
 # X = data.drop(columns=['結果'])
 # y = data['結果']
 
-X = data.drop(columns=['3連複_結果'])
+X = data.drop(columns=['レースコード', 'レース場', 'スタンド距離', '3連複_結果'])
 y = data['3連複_結果']
 
 # 訓練データとテストデータに分割
@@ -90,11 +90,11 @@ importance_df = importance_df.sort_values(by='重要度', ascending=False)
 # 特徴量の重要度を表示
 print(importance_df)
 
-# 特徴量の重要度をプロット
-plt.figure(figsize=(12, 8))
-plt.barh(importance_df['特徴量'], importance_df['重要度'])
-plt.xlabel('重要度')
-plt.ylabel('特徴量')
-plt.title('特徴量の重要度')
-plt.gca().invert_yaxis()
-plt.show()
+# # 特徴量の重要度をプロット
+# plt.figure(figsize=(12, 8))
+# plt.barh(importance_df['特徴量'], importance_df['重要度'])
+# plt.xlabel('重要度')
+# plt.ylabel('特徴量')
+# plt.title('特徴量の重要度')
+# plt.gca().invert_yaxis()
+# plt.show()
