@@ -38,6 +38,96 @@ print("データ前処理を開始します")
 # 新しいカラムを追加
 # new_data['1号艇勝敗'] = new_data['1着_艇番'].apply(lambda x: 1 if x == 1 else 0)
 
+race_course_to_stand_distance = {
+    "桐生": 47,
+    "戸田": 37,
+    "江戸川": 37.1,
+    "平和島": 37,
+    "多摩川": 41,
+
+    "浜名湖": 42.7,
+    "蒲郡": 41.3,
+    "常滑": 40,
+    "津": 40,
+
+    "三国": 45,
+    "びわこ": 47,
+    "住之江": 45,
+    "尼崎": 49.1,
+
+    "鳴門": 45,
+    "丸亀": 42,
+
+    "児島": 43,
+    "宮島": 40,
+    "徳山": 45,
+    "下関": 43,
+
+    "若松": 41,
+    "芦屋": 50,
+    "福岡": 50,
+    "唐津": 42,
+    "大村": 48
+}
+
+# 基本となる八方位の風向リスト（順番は固定）
+wind_directions = ['追い風', '左追い風', '左横風', '左向かい風', '向かい風', '右向かい風', '右横風', '右追い風']
+directions = ['北', '北東', '東', '南東', '南', '南西', '西', '北西']
+
+# 各レース場における風向の開始位置を定義
+starting_wind_direction = {
+    "桐生": "北",  # 追い風が北に対応
+    "戸田": "西",  
+    "江戸川": "南",
+    "平和島": "南",
+    "多摩川": "東",
+
+    "浜名湖": "北",
+    "蒲郡": "北東",
+    "常滑": "東",
+    "津": "東",
+
+    "三国": "北",
+    "びわこ": "北",
+    "住之江": "北",
+    "尼崎": "北東",
+
+    "鳴門": "北西",
+    "丸亀": "南",
+
+    "児島": "北",
+    "宮島": "北東",
+    "徳山": "南東",
+    "下関": "北東",
+
+    "若松": "北東",
+    "芦屋": "西",
+    "福岡": "西",
+    "唐津": "北",
+    "大村": "南西",
+}
+
+# 風向の変換関数を定義
+def transform_wind_direction(row):
+    race_course = row['レース場']
+    wind_dir = row['風向']
+    
+    # 風向が無風の場合、そのまま返す
+    if wind_dir == '無風':
+        return wind_dir
+    
+    # レース場ごとの風向の開始位置を特定
+    if race_course in starting_wind_direction:
+        start_dir = starting_wind_direction[race_course]
+        # 開始位置に合わせてリストを回転させる
+        index = directions.index(start_dir)
+        rotated_wind_directions = wind_directions[index:] + wind_directions[:index]
+        # 風向を変換
+        return rotated_wind_directions[directions.index(wind_dir)]
+    else:
+        return wind_dir
+    
+
 
 def transform_data(df):
     # 展示タイムのカラムを特定し、数値型に変換
@@ -63,6 +153,10 @@ def transform_data(df):
     total_deleted = deleted_count + invalid_time_count
     print(f"合計 {total_deleted} 行が削除されました。")
 
+    df['スタンド距離'] = df['レース場'].map(race_course_to_stand_distance)
+
+    # 風向を変換
+    df['風向'] = df.apply(transform_wind_direction, axis=1)
 
     # 変換したデータを格納するリスト
     transformed_rows = []
@@ -91,6 +185,7 @@ def transform_data(df):
                 '風向': row['風向'],
                 '風速': row['風速'],
                 '波の高さ': row['波の高さ'],
+                'スタンド距離': row['スタンド距離'],
                 # '距離': row['距離'],
                 # '決まり手': row['決まり手'],
             })
@@ -106,8 +201,8 @@ def transform_data(df):
             transformed_rows.append(frame_data)
 
     transformed_df = pd.DataFrame(transformed_rows)
-    # columns_order = ['レースコード', 'レース場', 'レース回', '天気', '風向', '風速', '波の高さ', '距離', '決まり手', '枠', '体重', '級別', '全国勝率', '全国2連対率', '当地勝率', '当地2連対率', 'モーター2連対率', 'ボート2連対率', '順位', '結果']
-    columns_order = ['レースコード', 'レース場', 'レース回', '天気', '風向', '風速', '波の高さ', '枠', '体重', '級別', '全国勝率', '全国2連対率', '当地勝率', '当地2連対率', 'モーター2連対率', 'ボート2連対率', '展示タイム', '順位', '結果', '3連複_結果']
+    # columns_order = ['レースコード', 'レース場', 'レース回', '天気', '風向', '風速', '波の高さ', 'スタンド距離', '距離', '決まり手', '枠', '体重', '級別', '全国勝率', '全国2連対率', '当地勝率', '当地2連対率', 'モーター2連対率', 'ボート2連対率', '順位', '結果']
+    columns_order = ['レースコード', 'レース場', 'レース回', '天気', '風向', '風速', '波の高さ', 'スタンド距離', '枠', '体重', '級別', '全国勝率', '全国2連対率', '当地勝率', '当地2連対率', 'モーター2連対率', 'ボート2連対率', '展示タイム', '順位', '結果', '3連複_結果']
     transformed_df = transformed_df[columns_order]
 
     return transformed_df
@@ -168,7 +263,7 @@ print("データ前処理が完了しました")
 
 for i in range(1, 7):
     boto1_df = transformed_df[transformed_df['枠'] == i]
-    boto1_file_path = f"{processed_dir}data_boto{i}.csv"
+    boto1_file_path = f"{processed_dir}data_boat{i}.csv"
 
     # CSVファイルとして保存
     transformed_df.to_csv(modified_file_path, index=False)

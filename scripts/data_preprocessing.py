@@ -11,7 +11,7 @@ def preprocess_boto_data(boat_number):
     processed_dir = 'data/processed/'
     
     # ファイルパスを生成
-    input_file_path = f"{processed_dir}data_boto{boat_number}.csv"
+    input_file_path = f"{processed_dir}data_boat{boat_number}.csv"
     output_file_path = f"{processed_dir}modified_data{boat_number}.csv"
 
     # データの読み込み
@@ -20,6 +20,7 @@ def preprocess_boto_data(boat_number):
     # 削除する列を指定
     columns_to_drop = [
         '枠', '順位', '結果', '天気', '体重',
+        # 'レース場', 
         '全国勝率', '全国2連対率', 'モーター2連対率', 'ボート2連対率', 
         '当地2連対率', '当地勝率', '全国2連対率_Zスコア', '当地2連対率_Zスコア', '展示タイム'
     ]
