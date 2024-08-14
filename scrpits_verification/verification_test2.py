@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 import japanize_matplotlib 
 japanize_matplotlib.japanize()
 
@@ -23,7 +24,8 @@ inverse_product_df = pd.DataFrame({
     # 'Inverse Product': [7.3] * 20 
     # 'Inverse Product': [8.0] * 20 
     # 'Inverse Product': [9.0] * 20 
-    'Inverse Product': [10.0] * 20 
+    # 'Inverse Product': [10.0] * 20 
+    'Inverse Product': [20.0] * 20 
 })
 
 # 1. `predict_result_1`から`predict_result_6`の列の中で「1」の数が2つより多い行をフィルタリング
@@ -50,6 +52,7 @@ total_payouts = 0
 bet_amount = 100  # 賭け金額を設定（例として100円）
 
 winning_odds = []
+purchased_odds = []
 
 for i, combinations in enumerate(relevant_combinations):
     row = filtered_df.iloc[i]
@@ -58,6 +61,7 @@ for i, combinations in enumerate(relevant_combinations):
         # 逆数の積よりもオッズが大きい場合に購入
         if row[combination] > inverse_value:
             total_purchases += bet_amount  # 100円ずつ購入すると仮定
+            purchased_odds.append(row[combination])  # 購入オッズを記録
             # この組み合わせが実際の結果と一致するか確認
             if combination == row['result']:
                 total_payouts += bet_amount * row[combination]  # 実際の払い戻しは賭け金 × オッズ
@@ -80,11 +84,22 @@ print(f"回収率 : {collection_rate}%")
 print(f"最大オッズのレースコード: {race_code_of_max_odds}, 最大オッズ: {max_odds}")
 
 
-# ヒストグラムの描画
+# ビンの幅を5に設定
+bin_width = 2.5
+bins = np.arange(0, max(max(winning_odds), max(purchased_odds)) + bin_width, bin_width)
+
+# 的中オッズと購入オッズのヒストグラムを重ねて描画
 plt.figure(figsize=(10, 6))
-plt.hist(winning_odds, bins=20, color='blue', edgecolor='black')
-plt.title('的中したオッズの分布')
+
+# 的中オッズのヒストグラム
+plt.hist(winning_odds, bins=bins, color='blue', edgecolor='black', alpha=0.5, label='的中オッズ')
+
+# 購入オッズのヒストグラム
+plt.hist(purchased_odds, bins=bins, color='green', edgecolor='black', alpha=0.5, label='購入オッズ')
+
+plt.title('的中オッズと購入オッズの分布')
 plt.xlabel('オッズ')
 plt.ylabel('頻度')
+plt.legend(loc='upper right')
 plt.grid(True)
 plt.show()

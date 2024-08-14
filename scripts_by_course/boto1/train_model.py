@@ -18,7 +18,7 @@ data = pd.read_csv(modified_file_path, low_memory=False)
 # X = data.drop(columns=['結果'])
 # y = data['結果']
 
-X = data.drop(columns=['3連複_結果'])
+X = data.drop(columns=['レースコード', 'レース場', '風向', '3連複_結果'])
 y = data['3連複_結果']
 
 # 訓練データとテストデータに分割
@@ -53,7 +53,7 @@ model.fit(X_train, y_train)
 
 
 # カスタム閾値の設定
-custom_threshold = 0.80  # ここでカスタム閾値を設定します
+custom_threshold = 0.60  # ここでカスタム閾値を設定します
 
 # モデルの予測
 y_pred_proba = model.predict_proba(X_test)[:, 1]
