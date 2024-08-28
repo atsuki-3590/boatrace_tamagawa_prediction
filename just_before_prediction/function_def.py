@@ -1,10 +1,13 @@
 from bs4 import BeautifulSoup 
+import re
 
 # raceresult_data
-def read_raceresult_data(file_path):
-    with open(file_path, 'r', encoding='utf-8') as file:
-        file_content = file.read()
-        soup = BeautifulSoup(file_content, 'html.parser')
+# def read_raceresult_data(file_path):
+def read_raceresult_data(soup):
+    # with open(file_path, 'r', encoding='utf-8') as file:
+    #     file_content = file.read()
+    #     soup = BeautifulSoup(file_content, 'html.parser')
+    # soup = BeautifulSoup(file_path, 'html.parser')
 
     # 気温: temperature取得
     weather1_bodyUnitLabelData = soup.find_all("span", class_="weather1_bodyUnitLabelData")
@@ -65,13 +68,14 @@ def read_raceresult_data(file_path):
     wave_height = float(wave_height_base.replace("cm", ""))
     
     
-    # 結果（一着枠番号）: result
-    # 'is-fs14 is-fBold is-boatColor'に続く数字を持つ最初のtd要素を探す
-    result_element = soup.find("td", class_=re.compile(r'is-fs14 is-fBold is-boatColor\d+'))
-    result_waku = int(result_element.text.strip())
-    result = get_frame_by_course(result_waku, file_path)
+    # # 結果（一着枠番号）: result
+    # # 'is-fs14 is-fBold is-boatColor'に続く数字を持つ最初のtd要素を探す
+    # result_element = soup.find("td", class_=re.compile(r'is-fs14 is-fBold is-boatColor\d+'))
+    # result_waku = int(result_element.text.strip())
+    # result = get_frame_by_course(result_waku, file_path)
     
     
   
 
-    return temperature, weather, wind_direction, wind_speed, water_temperature, wave_height, result
+    return temperature, weather, wind_direction, wind_speed, water_temperature, wave_height
+    # return temperature, weather, wind_direction, wind_speed, water_temperature, wave_height, result
