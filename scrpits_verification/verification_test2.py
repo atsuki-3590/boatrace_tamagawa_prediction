@@ -24,8 +24,8 @@ inverse_product_df = pd.DataFrame({
     # 'Inverse Product': [7.3] * 20 
     # 'Inverse Product': [8.0] * 20 
     # 'Inverse Product': [9.0] * 20 
-    # 'Inverse Product': [10.0] * 20 
-    'Inverse Product': [20.0] * 20 
+    'Inverse Product': [10.0] * 20 
+    # 'Inverse Product': [20.0] * 20 
 })
 
 # 1. `predict_result_1`から`predict_result_6`の列の中で「1」の数が2つより多い行をフィルタリング
