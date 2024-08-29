@@ -84,14 +84,14 @@ def read_raceresult_data(soup):
 
 
 
-def read_racelist_data(file_path_list, file_path_result, file_path_beforeinfo):
-    with open(file_path_list, 'r', encoding='utf-8') as file:
-        file_content = file.read()
-        soup = BeautifulSoup(file_content, 'html.parser')
+def read_racelist_data(soup_racelist, soup_raceresult, soup_beforeinfo):
+    # with open(file_path_list, 'r', encoding='utf-8') as file:
+    #     file_content = file.read()
+    #     soup_racelist = BeautifulSoup(file_content, 'html.parser')
         
-    with open(file_path_beforeinfo, 'r', encoding='utf-8') as file:
-        file_content = file.read()
-        soup_beforeinfo = BeautifulSoup(file_content, 'html.parser')
+    # with open(file_path_beforeinfo, 'r', encoding='utf-8') as file:
+    #     file_content = file.read()
+    #     soup_beforeinfo = BeautifulSoup(file_content, 'html.parser')
 
     
     affiliations = []
@@ -109,10 +109,10 @@ def read_racelist_data(file_path_list, file_path_result, file_path_beforeinfo):
     # 各枠の情報を取得
     for n in range(6):
         # 出走表情報
-        frame_result = get_frame_by_course((n+1), file_path_result)
+        frame_result = get_frame_by_course((n+1), soup_raceresult)
         if frame_result is None:
             frame_result = 6  # None の場合には 6 を代入する
-        n_waku = soup.find_all("tbody", class_="is-fs12")[int(frame_result)-1]
+        n_waku = soup_racelist.find_all("tbody", class_="is-fs12")[int(frame_result)-1]
         playerinfo_elem = n_waku.find_all("div", class_="is-fs11")
         sibu_elem = playerinfo_elem[1]
         
@@ -155,7 +155,7 @@ def read_racelist_data(file_path_list, file_path_result, file_path_beforeinfo):
         national_winning_rate = national_lines[0]
         national_winning_rate_list.append(float(national_winning_rate))
         
-        # 全国勝率: Local_winning_rate取得
+        # 当地勝率: Local_winning_rate取得
         Local_info = n_waku.find_all("td", class_="is-lineH2", rowspan="4")[2]
         Local_lines = Local_info.get_text(separator='\n').strip().split('\n')
         Local_winning_rate = Local_lines[0]
@@ -183,7 +183,7 @@ def read_racelist_data(file_path_list, file_path_result, file_path_beforeinfo):
             exhibition_time_list.append(0.0)  # または適切な値や None をセットすることができます。
 
             
-        # 展示タイム: exhibition_time取得
+        # チルト角度: tilt取得
         before_info = player_beforeinfo.find_all("td", rowspan="4")
         tilt = before_info[4].text.replace('\xa0', '').strip()
         try:
@@ -279,11 +279,11 @@ def check_head_tag_with_id(file_path):
 
 
 
-def get_frame_by_course(course, file_path):
-    with open(file_path, 'r', encoding='utf-8') as file:
-        file_content = file.read()
+def get_frame_by_course(course, soup_result):
+    # with open(file_path, 'r', encoding='utf-8') as file:
+    #     file_content = file.read()
     
-        soup_result = BeautifulSoup(file_content, 'html.parser')
+    #     soup_result = BeautifulSoup(file_content, 'html.parser')
     elems = soup_result.find_all(class_=re.compile("table1_boatImage1 is-type1__3rdadd"))
     # 結果を保存する辞書
     mapping = {}
