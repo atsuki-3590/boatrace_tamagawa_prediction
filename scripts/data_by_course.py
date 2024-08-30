@@ -33,6 +33,8 @@ columns_to_drop = [
 # 指定した列を削除
 new_data = df.drop(columns=columns_to_drop)
 
+print(new_data.columns)
+
 print("データ前処理を開始します")
 
 # 新しいカラムを追加
