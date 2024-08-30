@@ -7,10 +7,6 @@
 
 
 ## 検証方法
-
-
-
-## 実行方法
 ### データ準備
 1. 出走表データと結果データを結合（scripts\data_marged.py）
 
@@ -23,4 +19,8 @@
 4. データの一部を検証用に用いる、訓練されたモデルを用いて予測データを作成（scrpits_verification\verification_preprocessing.py）
 5. 予測データと結果データ、オッズデータを結合する（scrpits_verification\test_data_marged.py）
 6. 作成されたデータをもとに、回収率を計算する（scrpits_verification\verification_test2.py）
+
  
+
+ ## 実行方法
+ >python3 scrpits_verification\verification_test2.py

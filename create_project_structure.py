@@ -1,6 +1,7 @@
 # テンプレート構造
 import os
 
+
 def create_directory_structure(base_path):
     directories = [
         'data/raw',
