@@ -8,7 +8,7 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(script_dir)
 sys.path.append(os.path.join(project_root, 'utils'))
 
-from data_loader import load_data
+from utils.data_loader.py import load_data
 
 
 # データのロード
