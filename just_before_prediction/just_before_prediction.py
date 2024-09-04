@@ -52,6 +52,7 @@ beforeinfo = fetch_boatrace_data("beforeinfo")
 tuple_raceresult = read_raceresult_data(raceresult)
 df_raceresult = pd.DataFrame([tuple_raceresult], columns=['温度', '天気', '風向き', '風速', '波の高さ', 'その他の情報'])
 
+print("df_raceresult:", df_raceresult.columns)
 print(df_raceresult.head())
 
 
@@ -72,4 +73,18 @@ df_racelist = pd.DataFrame([tuple_racelist], columns = [
     '1枠_チルト', '2枠_チルト', '3枠_チルト', '4枠_チルト', '5枠_チルト', '6枠_チルト'
 ])
 
+print("df_racelist:", df_racelist.columns)
 print(df_racelist.head())
+
+
+"""
+これから追加
+
+レースコード
+レース場
+レース回
+1枠_級別
+1枠_全国2連対率
+1枠_当地2連対率
+1枠_ボート2連対率
+"""
