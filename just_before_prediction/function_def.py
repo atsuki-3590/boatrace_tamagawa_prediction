@@ -84,7 +84,7 @@ def read_raceresult_data(soup):
 
 
 
-def read_racelist_data(soup_racelist, soup_raceresult, soup_beforeinfo):
+def read_racelist_data(soup_racelist, soup_beforeinfo):
     # with open(file_path_list, 'r', encoding='utf-8') as file:
     #     file_content = file.read()
     #     soup_racelist = BeautifulSoup(file_content, 'html.parser')
@@ -108,19 +108,24 @@ def read_racelist_data(soup_racelist, soup_raceresult, soup_beforeinfo):
     
     # 各枠の情報を取得
     for n in range(6):
-        # 出走表情報
-        frame_result = get_frame_by_course((n+1), soup_raceresult)
-        if frame_result is None:
-            frame_result = 6  # None の場合には 6 を代入する
-        n_waku = soup_racelist.find_all("tbody", class_="is-fs12")[int(frame_result)-1]
+        # # 出走表情報
+        # frame_result = get_frame_by_course((n+1), soup_raceresult)
+        # if frame_result is None:
+        #     frame_result = 6  # None の場合には 6 を代入する
+        # n_waku = soup_racelist.find_all("tbody", class_="is-fs12")[int(frame_result)-1]
+        # playerinfo_elem = n_waku.find_all("div", class_="is-fs11")
+        # sibu_elem = playerinfo_elem[1]
+
+        n_waku = soup_racelist.find_all("tbody", class_="is-fs12")[n]
         playerinfo_elem = n_waku.find_all("div", class_="is-fs11")
         sibu_elem = playerinfo_elem[1]
         
         player_race_info_elem = n_waku.find_all("td", class_="is-lineH2", rowspan="4")[0]
         player_info_text = player_race_info_elem.get_text(strip=True)
         
-        # 直前情報（展示タイム、チルト）
-        player_beforeinfo = soup_beforeinfo.find_all("tbody", class_="is-fs12")[int(frame_result)-1]
+        # # 直前情報（展示タイム、チルト）
+        # player_beforeinfo = soup_beforeinfo.find_all("tbody", class_="is-fs12")[int(frame_result)-1]
+        player_beforeinfo = soup_beforeinfo.find_all("tbody", class_="is-fs12")[n]
         
         
         # 所属情報の取得
@@ -196,6 +201,27 @@ def read_racelist_data(soup_racelist, soup_raceresult, soup_beforeinfo):
    
     # 各変数をタプルとして結合して返す
     return tuple(affiliations + weights + F_number_list + L_number_list + average_ST_list + national_winning_rate_list + Local_winning_rate_list + motor_2nd_rate_list + motor_3rd_rate_list + exhibition_time_list + tilt_list)
+
+
+
+
+# 以下、使用していない関数
+def get_frame_by_course(course, soup_result):
+    # with open(file_path, 'r', encoding='utf-8') as file:
+    #     file_content = file.read()
+    
+    #     soup_result = BeautifulSoup(file_content, 'html.parser')
+    elems = soup_result.find_all(class_=re.compile("table1_boatImage1 is-type1__3rdadd"))
+    # 結果を保存する辞書
+    mapping = {}
+    
+    # elemsから艇番を取得して順番に辞書に追加
+    for idx, div in enumerate(elems):
+        boat_number = int(div.find("span", class_="table1_boatImage1Number").text.strip())
+        # idxは0から始まるので、コース番号はidx + 1となる
+        mapping[idx + 1] = boat_number
+    
+    return mapping.get(course)
 
 
 
@@ -278,23 +304,6 @@ def check_head_tag_with_id(file_path):
     return head_tag is None
 
 
-
-def get_frame_by_course(course, soup_result):
-    # with open(file_path, 'r', encoding='utf-8') as file:
-    #     file_content = file.read()
-    
-    #     soup_result = BeautifulSoup(file_content, 'html.parser')
-    elems = soup_result.find_all(class_=re.compile("table1_boatImage1 is-type1__3rdadd"))
-    # 結果を保存する辞書
-    mapping = {}
-    
-    # elemsから艇番を取得して順番に辞書に追加
-    for idx, div in enumerate(elems):
-        boat_number = int(div.find("span", class_="table1_boatImage1Number").text.strip())
-        # idxは0から始まるので、コース番号はidx + 1となる
-        mapping[idx + 1] = boat_number
-    
-    return mapping.get(course)
 
 
 

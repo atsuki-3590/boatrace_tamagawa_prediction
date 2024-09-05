@@ -31,9 +31,9 @@ Coursenumber = "05"
 
 
 def fetch_boatrace_data(page_type):
-    START_DATE = "2024-08-26"
+    START_DATE = "2024-09-05"
     date = dt.strptime(START_DATE, '%Y-%m-%d')
-    Racenumber = "5"
+    Racenumber = "12"
     Coursenumber = "05"
 
     url = f"https://www.boatrace.jp/owpc/pc/race/{page_type}?rno={Racenumber}&jcd={Coursenumber}&hd={date.strftime('%Y%m%d')}"
@@ -43,22 +43,22 @@ def fetch_boatrace_data(page_type):
 
     return bs
 
-raceresult = fetch_boatrace_data("raceresult")
+# raceresult = fetch_boatrace_data("raceresult")
 racelist = fetch_boatrace_data("racelist")
 beforeinfo = fetch_boatrace_data("beforeinfo")
 
 
-# 結果データを取得
-tuple_raceresult = read_raceresult_data(raceresult)
-df_raceresult = pd.DataFrame([tuple_raceresult], columns=['温度', '天気', '風向き', '風速', '波の高さ', 'その他の情報'])
+# # 結果データを取得
+# tuple_raceresult = read_raceresult_data(raceresult)
+# df_raceresult = pd.DataFrame([tuple_raceresult], columns=['温度', '天気', '風向き', '風速', '波の高さ', 'その他の情報'])
 
-print("df_raceresult:", df_raceresult.columns)
-print(df_raceresult.head())
+# print("df_raceresult:", df_raceresult.columns)
+# print(df_raceresult.head())
 
 
 
 # 出走表データを取得
-tuple_racelist = read_racelist_data(racelist, raceresult, beforeinfo)
+tuple_racelist = read_racelist_data(racelist, beforeinfo)
 df_racelist = pd.DataFrame([tuple_racelist], columns = [
     '1枠_支部', '2枠_支部', '3枠_支部', '4枠_支部', '5枠_支部', '6枠_支部',
     '1枠_体重', '2枠_体重', '3枠_体重', '4枠_体重', '5枠_体重', '6枠_体重',
