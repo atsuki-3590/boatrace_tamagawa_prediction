@@ -1,89 +1,8 @@
 from bs4 import BeautifulSoup 
 import re
 
-# raceresult_data
-# def read_raceresult_data(file_path):
-def read_raceresult_data(soup):
-    # with open(file_path, 'r', encoding='utf-8') as file:
-    #     file_content = file.read()
-    #     soup = BeautifulSoup(file_content, 'html.parser')
-    # soup = BeautifulSoup(file_path, 'html.parser')
 
-    # 気温: temperature取得
-    weather1_bodyUnitLabelData = soup.find_all("span", class_="weather1_bodyUnitLabelData")
-    temperature_base = weather1_bodyUnitLabelData[0].text.strip()
-    temperature = float(temperature_base.replace("℃", ""))
-
-        
-    # 天気: weather取得
-    weather1_bodyUnitLabelTitle = soup.find_all("span", class_="weather1_bodyUnitLabelTitle")
-    weather = weather1_bodyUnitLabelTitle[1].text.strip()
-
-    
-    # 風向: wind_direction取得
-    def convert_wind_number_to_direction(wind_number):
-        wind_direction_map = {
-            '1': '北',
-            '3': '北東',
-            '5': '東',
-            '7': '南東',
-            '9': '南',
-            '11': '南西',
-            '13': '西',
-            '15': '北西',
-            '17': '無風'
-         }
-        return wind_direction_map.get(wind_number)  # 存在しないkeyの場合はNoneを返す
-    wind_direction_elements = soup.find_all("p", class_="weather1_bodyUnitImage")
-    # 風向きを取得する処理
-    wind_number = None
-    for element in wind_direction_elements:
-        for class_name in element.get('class', []):  
-            match = re.search('is-wind(\d+)', class_name)
-            if match:
-                wind_number = match.group(1)
-                break
-        if wind_number:  # 数字が見つかったらループを抜ける
-            break
-    # 風向きの数字を方角の文字列に変換
-    wind_direction = convert_wind_number_to_direction(str(wind_number))
-    
-    
-    # 風速: wind_speed取得
-    weather1_bodyUnitLabelData = soup.find_all("span", class_="weather1_bodyUnitLabelData")
-    wind_speed_elem = weather1_bodyUnitLabelData[1] 
-    wind_speed_base = wind_speed_elem.text.strip() 
-    wind_speed = float(wind_speed_base.replace("m", ""))
-    
-    
-    # 水温: water_temperature取得
-    water_temperature_elem = weather1_bodyUnitLabelData[2] 
-    water_temperature_base = water_temperature_elem.text.strip() 
-    water_temperature = float(water_temperature_base.replace("℃", ""))
-    
-    
-    # 波高: wave_height取得
-    wave_height_elem = weather1_bodyUnitLabelData[3] # 要素のテキストから波高を取得
-    wave_height_base = wave_height_elem.text.strip() 
-    wave_height = float(wave_height_base.replace("cm", ""))
-    
-    
-    # # 結果（一着枠番号）: result
-    # # 'is-fs14 is-fBold is-boatColor'に続く数字を持つ最初のtd要素を探す
-    # result_element = soup.find("td", class_=re.compile(r'is-fs14 is-fBold is-boatColor\d+'))
-    # result_waku = int(result_element.text.strip())
-    # result = get_frame_by_course(result_waku, file_path)
-    
-    
-  
-
-    return temperature, weather, wind_direction, wind_speed, water_temperature, wave_height
-    # return temperature, weather, wind_direction, wind_speed, water_temperature, wave_height, result
-
-
-
-
-
+# 出走表データを取得する関数
 def read_racelist_data(soup_racelist, soup_beforeinfo):
     # with open(file_path_list, 'r', encoding='utf-8') as file:
     #     file_content = file.read()
@@ -94,12 +13,13 @@ def read_racelist_data(soup_racelist, soup_beforeinfo):
     #     soup_beforeinfo = BeautifulSoup(file_content, 'html.parser')
 
     
-    affiliations = []
-    weights = []
+    affiliations = [] 
+    weights = [] 
     F_number_list = [] 
     L_number_list = [] 
     average_ST_list = []
     national_winning_rate_list = []
+    national_2nd_rate_list = [] # 全国2連対率（新たに追加）
     Local_winning_rate_list = []
     motor_2nd_rate_list = []
     motor_3rd_rate_list = [] 
@@ -159,6 +79,10 @@ def read_racelist_data(soup_racelist, soup_beforeinfo):
         national_lines = national_info.get_text(separator='\n').strip().split('\n')
         national_winning_rate = national_lines[0]
         national_winning_rate_list.append(float(national_winning_rate))
+
+        # 全国2連対率: national_2nd_rate取得
+        national_2nd_rate = national_lines[2]
+        national_2nd_rate_list.append(float(national_2nd_rate))
         
         # 当地勝率: Local_winning_rate取得
         Local_info = n_waku.find_all("td", class_="is-lineH2", rowspan="4")[2]
@@ -200,111 +124,7 @@ def read_racelist_data(soup_racelist, soup_beforeinfo):
 
    
     # 各変数をタプルとして結合して返す
-    return tuple(affiliations + weights + F_number_list + L_number_list + average_ST_list + national_winning_rate_list + Local_winning_rate_list + motor_2nd_rate_list + motor_3rd_rate_list + exhibition_time_list + tilt_list)
-
-
-
-
-# 以下、使用していない関数
-def get_frame_by_course(course, soup_result):
-    # with open(file_path, 'r', encoding='utf-8') as file:
-    #     file_content = file.read()
-    
-    #     soup_result = BeautifulSoup(file_content, 'html.parser')
-    elems = soup_result.find_all(class_=re.compile("table1_boatImage1 is-type1__3rdadd"))
-    # 結果を保存する辞書
-    mapping = {}
-    
-    # elemsから艇番を取得して順番に辞書に追加
-    for idx, div in enumerate(elems):
-        boat_number = int(div.find("span", class_="table1_boatImage1Number").text.strip())
-        # idxは0から始まるので、コース番号はidx + 1となる
-        mapping[idx + 1] = boat_number
-    
-    return mapping.get(course)
-
-
-
-
-def exhibition_ST(file_path_beforeinfo, file_path_result):
-    with open(file_path_beforeinfo, 'r', encoding='utf-8') as file:
-        file_content = file.read()
-        soup_beforeinfo = BeautifulSoup(file_content, 'html.parser')
-
-    with open(file_path_result, 'r', encoding='utf-8') as file:
-        file_content = file.read()
-        soup_result = BeautifulSoup(file_content, 'html.parser')
-
-    exhibition_ST_list = []
-
-    def get_course_by_STframe(frame_number):
-        elems = soup_beforeinfo.find_all("div", class_=re.compile("table1_boatImage1"))
-        mapping = {}
-        for idx, div in enumerate(elems):
-            boat_number = int(div.find("span", class_="table1_boatImage1Number").text.strip())
-            mapping[boat_number] = idx + 1
-        return mapping.get(frame_number)
-
-    def get_STframe_by_course(course):
-        elems = soup_result.find_all("div", class_=re.compile("table1_boatImage1"))
-        mapping = {}
-        for idx, div in enumerate(elems):
-            boat_number = int(div.find("span", class_="table1_boatImage1Number").text.strip())
-            mapping[idx + 1] = boat_number
-        return mapping.get(course)
-
-    def get_start_time_by_course(course):
-        elems = soup_beforeinfo.find_all("div", class_=re.compile("table1_boatImage1"))
-        start_times = []
-        for elem in elems:
-            start_time_span = elem.find("span", class_="table1_boatImage1Time")
-            if start_time_span:
-                start_time = start_time_span.text.strip()
-                start_times.append(start_time)
-        if 1 <= course <= len(start_times):
-            return start_times[course - 1]
-
-    def convert_time_string(time_str):
-        if time_str.startswith('.'):
-            return float('0' + time_str)
-        elif time_str.startswith('F.'):
-            return -float('0' + time_str[1:])
-        else:
-            return float(time_str)
-
-    for n in range(1, 7):
-        frame_number = get_STframe_by_course(n)
-        if frame_number is None:
-            exhibition_ST_list.append(None)
-            continue
-        course = get_course_by_STframe(frame_number)
-        if course is None:
-            exhibition_ST_list.append(None)
-            continue
-        start_time_base = get_start_time_by_course(course)
-        if start_time_base is not None:
-            start_time = convert_time_string(start_time_base)
-            exhibition_ST_list.append(start_time)
-        else:
-            exhibition_ST_list.append(None)
-
-    return tuple(exhibition_ST_list)
-
-
-
-# HTMLファイルに特定のIDを持つheadタグが存在するかどうかをチェックする関数
-def check_head_tag_with_id(file_path):
-    with open(file_path, 'r', encoding='utf-8') as file:
-        soup = BeautifulSoup(file, 'html.parser')
-    
-    # IDが'TOTHP015A_1'のheadタグを検索します。
-    head_tag = soup.find('head', id='TOTHP015A_1')
-    
-    # head_tagがNoneでなければ、そのIDを持つheadタグが存在することになります。
-    return head_tag is None
-
-
-
+    return tuple(affiliations + weights + F_number_list + L_number_list + average_ST_list + national_winning_rate_list + national_2nd_rate_list + Local_winning_rate_list + motor_2nd_rate_list + motor_3rd_rate_list + exhibition_time_list + tilt_list)
 
 
 
