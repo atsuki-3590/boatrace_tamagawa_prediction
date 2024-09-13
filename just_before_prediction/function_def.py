@@ -13,6 +13,7 @@ def read_racelist_data(soup_racelist, soup_beforeinfo):
     #     soup_beforeinfo = BeautifulSoup(file_content, 'html.parser')
 
     
+    player_rank_list = [] # 級別の追加
     affiliations = [] 
     weights = [] 
     F_number_list = [] 
@@ -21,8 +22,10 @@ def read_racelist_data(soup_racelist, soup_beforeinfo):
     national_winning_rate_list = []
     national_2nd_rate_list = [] # 全国2連対率（新たに追加）
     Local_winning_rate_list = []
+    Local_2nd_rate_list = [] # 当地2連対率（新たに追加）
     motor_2nd_rate_list = []
     motor_3rd_rate_list = [] 
+    boat_2nd_rate_list = [] # ボート2連対率（新たに追加）
     exhibition_time_list = []
     tilt_list = []
     
@@ -38,6 +41,7 @@ def read_racelist_data(soup_racelist, soup_beforeinfo):
 
         n_waku = soup_racelist.find_all("tbody", class_="is-fs12")[n]
         playerinfo_elem = n_waku.find_all("div", class_="is-fs11")
+        number_elem = playerinfo_elem[0]
         sibu_elem = playerinfo_elem[1]
         
         player_race_info_elem = n_waku.find_all("td", class_="is-lineH2", rowspan="4")[0]
@@ -46,7 +50,11 @@ def read_racelist_data(soup_racelist, soup_beforeinfo):
         # # 直前情報（展示タイム、チルト）
         # player_beforeinfo = soup_beforeinfo.find_all("tbody", class_="is-fs12")[int(frame_result)-1]
         player_beforeinfo = soup_beforeinfo.find_all("tbody", class_="is-fs12")[n]
-        
+
+        # 級別の取得
+        player_rank_elem = number_elem.find_next("span")
+        player_rank = player_rank_elem.text.strip()
+        player_rank_list.append(player_rank) 
         
         # 所属情報の取得
         affiliation = sibu_elem.text.split('/')[0].strip()
@@ -89,6 +97,10 @@ def read_racelist_data(soup_racelist, soup_beforeinfo):
         Local_lines = Local_info.get_text(separator='\n').strip().split('\n')
         Local_winning_rate = Local_lines[0]
         Local_winning_rate_list.append(float(Local_winning_rate))
+
+        # 当地2連対率: Local_2nd_rate取得
+        Local_2nd_rate = Local_lines[2]
+        Local_2nd_rate_list.append(float(Local_2nd_rate))
         
         # モーター2連率: motor_2nd_rate取得
         motor_info = n_waku.find_all("td", class_="is-lineH2", rowspan="4")[3]
@@ -99,7 +111,12 @@ def read_racelist_data(soup_racelist, soup_beforeinfo):
         # モーター3連率: motor_3rd_rate取得
         motor_3rd_rate = motor_lines[4]
         motor_3rd_rate_list.append(float(motor_3rd_rate))   
-        
+
+        # ボート2連率: boat_2nd_rate取得
+        boat_info = n_waku.find_all("td", class_="is-lineH2", rowspan="4")[4]
+        boat_lines = boat_info.get_text(separator='\n').strip().split('\n')
+        boat_2nd_rate = boat_lines[2]
+        boat_2nd_rate_list.append(float(boat_2nd_rate))
         
         # 展示タイム: exhibition_time取得
         before_info = player_beforeinfo.find_all("td", rowspan="4")
@@ -124,7 +141,7 @@ def read_racelist_data(soup_racelist, soup_beforeinfo):
 
    
     # 各変数をタプルとして結合して返す
-    return tuple(affiliations + weights + F_number_list + L_number_list + average_ST_list + national_winning_rate_list + national_2nd_rate_list + Local_winning_rate_list + motor_2nd_rate_list + motor_3rd_rate_list + exhibition_time_list + tilt_list)
+    return tuple(player_rank_list + affiliations + weights + F_number_list + L_number_list + average_ST_list + national_winning_rate_list + national_2nd_rate_list + Local_winning_rate_list + Local_2nd_rate_list + motor_2nd_rate_list + motor_3rd_rate_list + boat_2nd_rate_list + exhibition_time_list + tilt_list)
 
 
 
