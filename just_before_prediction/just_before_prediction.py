@@ -1,7 +1,7 @@
 from datetime import datetime as dt
 import requests
 from bs4 import BeautifulSoup 
-from function_def import read_raceresult_data, read_racelist_data
+from function_def import read_racelist_data
 import pandas as pd
 
 """
@@ -66,6 +66,7 @@ df_racelist = pd.DataFrame([tuple_racelist], columns = [
     '1枠_L数', '2枠_L数', '3枠_L数', '4枠_L数', '5枠_L数', '6枠_L数',
     '1枠_平均ST', '2枠_平均ST', '3枠_平均ST', '4枠_平均ST', '5枠_平均ST', '6枠_平均ST',
     '1枠_全国勝率', '2枠_全国勝率', '3枠_全国勝率', '4枠_全国勝率', '5枠_全国勝率', '6枠_全国勝率',
+    '1枠_全国2連対率', '2枠_全国2連対率', '3枠_全国2連対率', '4枠_全国2連対率', '5枠_全国2連対率', '6枠_全国2連対率', 
     '1枠_当地勝率', '2枠_当地勝率', '3枠_当地勝率', '4枠_当地勝率', '5枠_当地勝率', '6枠_当地勝率',
     '1枠_モーター2連対率', '2枠_モーター2連対率', '3枠_モーター2連対率', '4枠_モーター2連対率', '5枠_モーター2連対率', '6枠_モーター2連対率',
     '1枠_モーター3連率', '2枠_モーター3連率', '3枠_モーター3連率', '4枠_モーター3連率', '5枠_モーター3連率', '6枠_モーター3連率',
@@ -74,6 +75,7 @@ df_racelist = pd.DataFrame([tuple_racelist], columns = [
 ])
 
 print("df_racelist:", df_racelist.columns)
+print("1枠_全国2連対率:", df_racelist['1枠_全国2連対率'])
 print(df_racelist.head())
 
 
