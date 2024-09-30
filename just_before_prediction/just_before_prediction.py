@@ -3,6 +3,8 @@ import requests
 from bs4 import BeautifulSoup 
 from function_def import read_racelist_data, read_course_condition
 import pandas as pd
+import joblib 
+import os 
 
 """
 Index(['レースコード', 'レース場', 'レース回', '天気', '風向', '風速', '波の高さ', '1枠_体重', '1枠_級別',
@@ -33,25 +35,20 @@ race_course_to_course_number = {
     "江戸川": "03",
     "平和島": "04",
     "多摩川": "05",
-
     "浜名湖": "06",
     "蒲郡": "07",
     "常滑": "08",
     "津": "09",
-
     "三国": "10",
     "びわこ": "11",
     "住之江": "12",
     "尼崎": "13",
-
     "鳴門": "14",
     "丸亀": "15",
-
     "児島": "16",
     "宮島": "17",
     "徳山": "18",
     "下関": "19",
-
     "若松": "20",
     "芦屋": "21",
     "福岡": "22",
@@ -59,31 +56,43 @@ race_course_to_course_number = {
     "大村": "24"
 }
 
+# 風向のマッピング
+wind_direction_map = {
+    '追い風': 1,
+    '左追い風': 2,
+    '左横風': 3,
+    '左向かい風': 4,
+    '向かい風': 5,
+    '右向かい風': 6,
+    '右横風': 7,
+    '右追い風': 8,
+    '無風': 9
+}
+
+# 級別のマッピング
+grade_mapping = {'A1': 1, 'A2': 2, 'B1': 3, 'B2': 4}
+
+# レース場とスタンド距離のマッピング
 race_course_to_stand_distance = {
     "桐生": 47,
     "戸田": 37,
     "江戸川": 37.1,
     "平和島": 37,
     "多摩川": 41,
-
     "浜名湖": 42.7,
     "蒲郡": 41.3,
     "常滑": 40,
     "津": 40,
-
     "三国": 45,
     "びわこ": 47,
     "住之江": 45,
     "尼崎": 49.1,
-
     "鳴門": 45,
     "丸亀": 42,
-
     "児島": 43,
     "宮島": 40,
     "徳山": 45,
     "下関": 43,
-
     "若松": 41,
     "芦屋": 50,
     "福岡": 50,
@@ -197,16 +206,88 @@ for col in columns_to_zscore:
     add_z_score(df_final, col)
 
 # 必要なカラムを最終的な形にする
-df_final = df_final[['レース場', 'レース回', '風向', '風速', '波の高さ', 'スタンド距離', '級別', 
-                     '全国勝率_Zスコア', '当地勝率_Zスコア', 'モーター2連対率_Zスコア', 'ボート2連対率_Zスコア', '展示タイム_Zスコア']]
+df_final = df_final[['枠', 'レース場', 'レース回', '風向', '風速', '波の高さ', 
+                     'スタンド距離', '級別', '全国勝率_Zスコア', 
+                     '当地勝率_Zスコア', 'モーター2連対率_Zスコア', 
+                     'ボート2連対率_Zスコア', '展示タイム_Zスコア']]
+
+# レース場の番号を数値型に変換
+race_course_to_course_number_int = {k: int(v) for k, v in race_course_to_course_number.items()}
+df_final['レース場'] = df_final['レース場'].map(race_course_to_course_number_int)
+
+# 級別のエンコーディング
+df_final['級別'] = df_final['級別'].map(grade_mapping)
+
+# 風向のエンコーディング
+df_final['風向'] = df_final['風向'].map(wind_direction_map)
+
+# '枠' カラムを追加（1〜6）
+df_final['枠'] = range(1, 7)
+
+# 訓練時の特徴量リストをロード
+with open('models/trained_features.pkl', 'rb') as f:
+    trained_features = pickle.load(f)
+
+# 予測に使用する特徴量を選択
+# 訓練時に使用した特徴量は 'trained_features'
+# 予測データがそれと一致するように整形
+
+# 訓練時に使用した特徴量を含めるために、df_finalに存在しないものは追加
+for feature in trained_features:
+    if feature not in df_final.columns:
+        df_final[feature] = 0  # 適切なデフォルト値を設定
+
+# 訓練時の特徴量順に並べ替える
+features_for_prediction = df_final[trained_features]
+
+# モデルのパスを定義
+model_paths = {
+    1: 'models/boat1_model_1.pkl',
+    2: 'models/boat2_model_1.pkl',
+    3: 'models/boat3_model_1.pkl',
+    4: 'models/boat4_model_1.pkl',
+    5: 'models/boat5_model_1.pkl',
+    6: 'models/boat6_model_1.pkl',
+}
+
+# モデルをロード
+models = {}
+for boat_num, path in model_paths.items():
+    if os.path.exists(path):
+        models[boat_num] = joblib.load(path)
+    else:
+        print(f"モデルが見つかりません: {path}")
+        models[boat_num] = None
+
+# 予測結果を格納するリスト
+predictions = []
+
+# 各行に対して予測を行う
+for index, row in features_for_prediction.iterrows():
+    boat_num = df_final['枠'][index]
+    model = models.get(boat_num)
+    
+    if model is not None:
+        # 特徴量の抽出（DataFrameの行として渡す）
+        features = row.to_frame().T  # DataFrameとして渡す
+        
+        # 予測を実行
+        pred = model.predict(features)[0]
+        
+        # 予測結果をリストに追加
+        predictions.append(pred)
+    else:
+        # モデルがロードされていない場合
+        predictions.append(None)
+
+# 予測結果をデータフレームに追加
+df_final['予測_3着以内'] = predictions
+
+# 必要なカラムを再度整理
+df_final = df_final[['レース場', 'レース回', '風向', '風速', '波の高さ', 'スタンド距離',
+                     '級別', '全国勝率_Zスコア', '当地勝率_Zスコア', 
+                     'モーター2連対率_Zスコア', 'ボート2連対率_Zスコア', 
+                     '展示タイム_Zスコア', '予測_3着以内']]
 
 # 結果の表示
 print(df_final)
-
-
-
-"""
-今後の処理
-カテゴリカルデータ（レース場、風向、級別）のラベルエンコーディング
-そもそもの前処理の部分から必要そう
-"""
