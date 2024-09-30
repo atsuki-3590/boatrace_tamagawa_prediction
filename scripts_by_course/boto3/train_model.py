@@ -99,3 +99,5 @@ plt.ylabel('特徴量')
 plt.title('特徴量の重要度')
 plt.gca().invert_yaxis()
 plt.show()
+
+こちらでもお願いします
