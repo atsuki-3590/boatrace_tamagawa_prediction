@@ -1,6 +1,7 @@
 import pandas as pd
 from functools import reduce
 
+# 予測データが含まれる
 file_paths = [
     'data/processed/test_predictions_boat1.csv',
     'data/processed/test_predictions_boat2.csv',
@@ -10,6 +11,7 @@ file_paths = [
     'data/processed/test_predictions_boat6.csv'
 ]
 
+# 3連複結果の取得に必要
 result_file_paths = [
     'data/processed/data_boto1.csv',
     'data/processed/data_boto2.csv',
