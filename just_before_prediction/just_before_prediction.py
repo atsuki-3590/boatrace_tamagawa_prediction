@@ -5,6 +5,7 @@ from function_def import read_racelist_data, read_course_condition
 import pandas as pd
 import joblib 
 import os 
+import pickle
 
 """
 Index(['レースコード', 'レース場', 'レース回', '天気', '風向', '風速', '波の高さ', '1枠_体重', '1枠_級別',
@@ -102,8 +103,8 @@ race_course_to_stand_distance = {
 
 
 
-DATE = "2024-09-05"
-Racenumber = "12"
+DATE = "2024-10-01"
+Racenumber = "11"
 Course = "多摩川"
 
 stand_distance = race_course_to_stand_distance.get(Course)
@@ -224,23 +225,19 @@ df_final['風向'] = df_final['風向'].map(wind_direction_map)
 # '枠' カラムを追加（1〜6）
 df_final['枠'] = range(1, 7)
 
-# 訓練時の特徴量リストをロード
-with open('models/trained_features.pkl', 'rb') as f:
-    trained_features = pickle.load(f)
-
 # 予測に使用する特徴量を選択
 # 訓練時に使用した特徴量は 'trained_features'
 # 予測データがそれと一致するように整形
 
-# 訓練時に使用した特徴量を含めるために、df_finalに存在しないものは追加
-for feature in trained_features:
-    if feature not in df_final.columns:
-        df_final[feature] = 0  # 適切なデフォルト値を設定
+# # 訓練時に使用した特徴量を含めるために、df_finalに存在しないものは追加
+# for feature in trained_features:
+#     if feature not in df_final.columns:
+#         df_final[feature] = 0  # 適切なデフォルト値を設定
 
-# 訓練時の特徴量順に並べ替える
-features_for_prediction = df_final[trained_features]
+# # 訓練時の特徴量順に並べ替える
+# features_for_prediction = df_final[trained_features]
 
-# モデルのパスを定義
+# モデルと特徴量リストのロード
 model_paths = {
     1: 'models/boat1_model_1.pkl',
     2: 'models/boat2_model_1.pkl',
@@ -249,44 +246,76 @@ model_paths = {
     5: 'models/boat5_model_1.pkl',
     6: 'models/boat6_model_1.pkl',
 }
+trained_feature_paths = {
+    1: 'models/trained_features_boat1.pkl',
+    2: 'models/trained_features_boat2.pkl',
+    3: 'models/trained_features_boat3.pkl',
+    4: 'models/trained_features_boat4.pkl',
+    5: 'models/trained_features_boat5.pkl',
+    6: 'models/trained_features_boat6.pkl',
+}
 
-# モデルをロード
 models = {}
-for boat_num, path in model_paths.items():
-    if os.path.exists(path):
-        models[boat_num] = joblib.load(path)
+trained_features = {}
+
+# モデルと特徴量リストをロード
+for boat_num in range(1, 7):
+    model_path = model_paths.get(boat_num)
+    feature_path = trained_feature_paths.get(boat_num)
+
+    # モデルのロード
+    if os.path.exists(model_path):
+        models[boat_num] = joblib.load(model_path)
+        # print(f"モデル {boat_num} がロードされました: {model_path}")
     else:
-        print(f"モデルが見つかりません: {path}")
+        # print(f"モデルが見つかりません: {model_path}")
         models[boat_num] = None
 
-# 予測結果を格納するリスト
+    # 特徴量リストのロード
+    if os.path.exists(feature_path):
+        with open(feature_path, 'rb') as f:
+            trained_features[boat_num] = pickle.load(f)
+            # print(f"特徴量リスト {boat_num} がロードされました: {feature_path}")
+    else:
+        # print(f"特徴量リストが見つかりません: {feature_path}")
+        trained_features[boat_num] = []
+
+# ワンホットエンコーディングを適用
+df_final = pd.get_dummies(df_final, columns=['レース場', '級別', '風向'], drop_first=False)
+
 predictions = []
 
-# 各行に対して予測を行う
-for index, row in features_for_prediction.iterrows():
-    boat_num = df_final['枠'][index]
+# 各ボートごとの予測を実行
+for index, row in df_final.iterrows():
+    boat_num = row['枠']
     model = models.get(boat_num)
-    
-    if model is not None:
-        # 特徴量の抽出（DataFrameの行として渡す）
-        features = row.to_frame().T  # DataFrameとして渡す
-        
-        # 予測を実行
-        pred = model.predict(features)[0]
-        
-        # 予測結果をリストに追加
-        predictions.append(pred)
+    feature_list = trained_features.get(boat_num)
+
+    if model is not None and feature_list:
+        # 訓練時の特徴量リストに従って、必要な特徴量のみを抽出
+        features_for_prediction = row.reindex(feature_list).fillna(0)
+
+        # DataFrameに変換して渡す
+        features_for_prediction_df = pd.DataFrame([features_for_prediction], columns=feature_list)
+
+        try:
+            # 予測を実行
+            pred = model.predict(features_for_prediction_df)[0]
+            predictions.append(pred)
+        except ValueError as e:
+            print(f"予測エラー for boat {boat_num} at index {index}: {e}")
+            predictions.append(None)
     else:
-        # モデルがロードされていない場合
+        print(f"モデルまたは特徴量リストが見つかりません for boat {boat_num}")
         predictions.append(None)
 
 # 予測結果をデータフレームに追加
 df_final['予測_3着以内'] = predictions
 
 # 必要なカラムを再度整理
-df_final = df_final[['レース場', 'レース回', '風向', '風速', '波の高さ', 'スタンド距離',
-                     '級別', '全国勝率_Zスコア', '当地勝率_Zスコア', 
-                     'モーター2連対率_Zスコア', 'ボート2連対率_Zスコア', 
+df_final = df_final[['レース回', '風速', '波の高さ', 'スタンド距離',
+                     '全国勝率_Zスコア', '当地勝率_Zスコア',
+                     'モーター2連対率_Zスコア', 'ボート2連対率_Zスコア',
                      '展示タイム_Zスコア', '予測_3着以内']]
 
 # 結果の表示

@@ -11,14 +11,14 @@ import japanize_matplotlib
 
 japanize_matplotlib.japanize()
 
-modified_file_path = f"data\processed\modified_data3.csv"
+modified_file_path = f"data/processed/modified_data3.csv"
 data = pd.read_csv(modified_file_path, low_memory=False)
 
 # 特徴量とターゲットに分ける
 # X = data.drop(columns=['結果'])
 # y = data['結果']
 
-X = data.drop(columns=['3連複_結果'])
+X = data.drop(columns=['レースコード', '3連複_結果'])
 y = data['3連複_結果']
 
 # 訓練データとテストデータに分割
@@ -71,10 +71,20 @@ print(f"Classification Report: \n{report}")
 print("モデルのトレーニングが完了しました")
 
 # モデルの保存
-with open('models/boat3_model_1.pkl', 'wb') as model_file:
+model_filename = 'models/boat3_model_1.pkl'
+with open(model_filename, 'wb') as model_file:
     pickle.dump(model, model_file)
 
-print("モデルが保存されました")
+print(f"モデルが保存されました: {model_filename}")
+
+# 訓練時の特徴量リストを保存
+trained_features = X.columns.tolist()
+features_filename = 'models/trained_features_boat3.pkl'
+with open(features_filename, 'wb') as f:
+    pickle.dump(trained_features, f)
+
+print(f"訓練時の特徴量リストが保存されました: {features_filename}")
+
 
 
 
@@ -91,13 +101,11 @@ importance_df = importance_df.sort_values(by='重要度', ascending=False)
 # 特徴量の重要度を表示
 print(importance_df)
 
-# 特徴量の重要度をプロット
-plt.figure(figsize=(12, 8))
-plt.barh(importance_df['特徴量'], importance_df['重要度'])
-plt.xlabel('重要度')
-plt.ylabel('特徴量')
-plt.title('特徴量の重要度')
-plt.gca().invert_yaxis()
-plt.show()
-
-こちらでもお願いします
+# # 特徴量の重要度をプロット
+# plt.figure(figsize=(12, 8))
+# plt.barh(importance_df['特徴量'], importance_df['重要度'])
+# plt.xlabel('重要度')
+# plt.ylabel('特徴量')
+# plt.title('特徴量の重要度')
+# plt.gca().invert_yaxis()
+# plt.show()
