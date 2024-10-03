@@ -11,46 +11,20 @@ import japanize_matplotlib
 
 japanize_matplotlib.japanize()
 
-modified_file_path = f"data\processed\modified_data2.csv"
+# ファイルパスの修正（バックスラッシュからスラッシュへ）
+modified_file_path = "data/processed/modified_data2.csv"
 data = pd.read_csv(modified_file_path, low_memory=False)
 
 # 特徴量とターゲットに分ける
-# X = data.drop(columns=['結果'])
-# y = data['結果']
-
 X = data.drop(columns=['レースコード', 'レース場', 'スタンド距離', '3連複_結果'])
 y = data['3連複_結果']
 
-# 訓練データとテストデータに分割
-# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)   # シャッフルなし
-
+# 訓練データとテストデータに分割（シャッフルなし）
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
 
 # モデルの訓練
 model = RandomForestClassifier(random_state=42)
 model.fit(X_train, y_train)
-
-
-# # オーバーサンプリング
-
-# # SMOTEのインスタンス化
-# sm = SMOTE(random_state=42)
-# # 訓練データの再サンプリング
-# X_train_res, y_train_res = sm.fit_resample(X_train, y_train)
-# # モデルの訓練（再サンプリング後のデータを使用）
-# model.fit(X_train_res, y_train_res)
-
-
-
-# アンダーサンプリング
-
-# # アンダーサンプリングのインスタンスを作成
-# rus = RandomUnderSampler(random_state=42)
-# # 訓練データにアンダーサンプリングを適用
-# X_train_res, y_train_res = rus.fit_resample(X_train, y_train)
-# # モデルの訓練
-# model.fit(X_train_res, y_train_res)
-
 
 # カスタム閾値の設定
 custom_threshold = 0.40  # ここでカスタム閾値を設定します
@@ -69,13 +43,21 @@ print(f"Accuracy: {accuracy}")
 print(f"AUC Score: {auc_score}")
 print(f"Classification Report: \n{report}")
 print("モデルのトレーニングが完了しました")
+
 # モデルの保存
-with open('models/boat2_model_1.pkl', 'wb') as model_file:
+model_filename = 'models/boat2_model_1.pkl'
+with open(model_filename, 'wb') as model_file:
     pickle.dump(model, model_file)
 
-print("モデルが保存されました")
+print(f"モデルが保存されました: {model_filename}")
 
+# 訓練時の特徴量リストを保存
+trained_features = X.columns.tolist()
+features_filename = 'models/trained_features_boat2.pkl'
+with open(features_filename, 'wb') as f:
+    pickle.dump(trained_features, f)
 
+print(f"訓練時の特徴量リストが保存されました: {features_filename}")
 
 # 特徴量の重要度を確認
 feature_importances = model.feature_importances_
