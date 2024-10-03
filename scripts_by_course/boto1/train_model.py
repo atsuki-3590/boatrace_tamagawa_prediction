@@ -52,7 +52,7 @@ print("モデルが保存されました")
 # 訓練時の特徴量リストを保存
 trained_features = X.columns.tolist()
 
-with open('models/trained_features.pkl', 'wb') as f:
+with open('models/trained_features_boat1.pkl', 'wb') as f:
     pickle.dump(trained_features, f)
 
 print("訓練時の特徴量リストが保存されました")
