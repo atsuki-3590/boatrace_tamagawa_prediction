@@ -146,7 +146,6 @@ df_racelist = pd.DataFrame([tuple_racelist], columns = [
     '1枠_チルト', '2枠_チルト', '3枠_チルト', '4枠_チルト', '5枠_チルト', '6枠_チルト'
 ])
 
-
 tuple_course_condition = read_course_condition(beforeinfo)
 df_course_condition = pd.DataFrame([tuple_course_condition], columns = [
     '気温', '天気', '風向', '風速', '水温', '波高'
