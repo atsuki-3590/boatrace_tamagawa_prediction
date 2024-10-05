@@ -1,9 +1,16 @@
 import os
+import sys
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 
-# データ前処理
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(script_dir)
+if project_root not in sys.path:
+    sys.path.append(project_root)
 
+from race_studium_data import race_course_to_course_number
+
+# データ前処理
 def preprocess_boto_data(boat_number):
     print(f"データ前処理を開始します ({boat_number}号艇)")
 
@@ -27,6 +34,11 @@ def preprocess_boto_data(boat_number):
 
     # 指定した列を削除
     new_data = df.drop(columns=columns_to_drop)
+
+    # レース場のマッピングを適用し、数値型に変換
+    if 'レース場' in new_data.columns:
+        new_data['レース場'] = new_data['レース場'].map(race_course_to_course_number).astype(float)
+
 
     # 欠損値の確認
     missing_values = new_data.isnull().sum()
