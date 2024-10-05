@@ -9,8 +9,8 @@ import pickle
 
 
 DATE = "2024-10-05"
-Racenumber = "01"
-Course = "唐津"
+Racenumber = "12"
+Course = "津"
 
 
 """
@@ -239,12 +239,12 @@ df_final['枠'] = range(1, 7)
 
 # モデルと特徴量リストのロード
 model_paths = {
-    1: 'models/boat1_model_1.pkl',
-    2: 'models/boat2_model_1.pkl',
-    3: 'models/boat3_model_1.pkl',
-    4: 'models/boat4_model_1.pkl',
-    5: 'models/boat5_model_1.pkl',
-    6: 'models/boat6_model_1.pkl',
+    1: 'models/boat1_model.pkl',
+    2: 'models/boat2_model.pkl',
+    3: 'models/boat3_model.pkl',
+    4: 'models/boat4_model.pkl',
+    5: 'models/boat5_model.pkl',
+    6: 'models/boat6_model.pkl',
 }
 trained_feature_paths = {
     1: 'models/trained_features_boat1.pkl',
