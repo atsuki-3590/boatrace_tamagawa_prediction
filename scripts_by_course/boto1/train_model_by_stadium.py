@@ -8,47 +8,31 @@ from imblearn.under_sampling import RandomUnderSampler
 import pickle
 import matplotlib.pyplot as plt
 import japanize_matplotlib 
+import os
+import sys
 
 japanize_matplotlib.japanize()
 
-# レース場とコース番号のマッピング
-race_course_to_course_number = {
-    "桐生": "01",
-    "戸田": "02",
-    "江戸川": "03",
-    "平和島": "04",
-    "多摩川": "05",
-    "浜名湖": "06",
-    "蒲郡": "07",
-    "常滑": "08",
-    "津": "09",
-    "三国": "10",
-    "びわこ": "11",
-    "住之江": "12",
-    "尼崎": "13",
-    "鳴門": "14",
-    "丸亀": "15",
-    "児島": "16",
-    "宮島": "17",
-    "徳山": "18",
-    "下関": "19",
-    "若松": "20",
-    "芦屋": "21",
-    "福岡": "22",
-    "唐津": "23",
-    "大村": "24"
-}
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(os.path.dirname(script_dir))
+if project_root not in sys.path:
+    sys.path.append(project_root)
+
+from race_studium_data import race_course_to_course_number
+
+
 
 # 使用するレース場を指定
 race_stadium = "多摩川"
-course_number = race_course_to_course_number[race_stadium]
+course_number_str = race_course_to_course_number[race_stadium]
+course_number_int = int(course_number_str) 
 
 
 modified_file_path = f"data/processed/modified_data1.csv"
 data = pd.read_csv(modified_file_path, low_memory=False)
 
 # 指定したレース場のデータのみを選択
-data = data[data['レース場'] == race_stadium]
+data = data[data['レース場'] == course_number_int]
 
 # 特徴量とターゲットに分ける
 X = data.drop(columns=['レースコード', 'レース場', '風向', '3連複_結果'])
@@ -73,6 +57,7 @@ accuracy = accuracy_score(y_test, y_pred)
 report = classification_report(y_test, y_pred)
 auc_score = roc_auc_score(y_test, y_pred_proba)
 
+print(f"ボートレース{race_stadium}")
 print(f"Custom_threshold: {custom_threshold}")
 print(f"Accuracy: {accuracy}")
 print(f"AUC Score: {auc_score}")
@@ -80,7 +65,7 @@ print(f"Classification Report: \n{report}")
 print("モデルのトレーニングが完了しました")
 
 # モデルの保存
-model_filename = f'models/boat1_{course_number}_model.pkl'
+model_filename = f'models/{course_number_str}_boat1_model.pkl'
 with open(model_filename, 'wb') as model_file:
     pickle.dump(model, model_file)
 
@@ -88,7 +73,7 @@ print(f"モデルが保存されました: {model_filename}")
 
 # 訓練時の特徴量リストを保存
 trained_features = X.columns.tolist()
-features_filename = f'models/trained_features_boat1_{course_number}.pkl'
+features_filename = f'models/{course_number_str}_trained_features_boat1.pkl'
 with open(features_filename, 'wb') as f:
     pickle.dump(trained_features, f)
 
@@ -107,11 +92,11 @@ importance_df = importance_df.sort_values(by='重要度', ascending=False)
 # 特徴量の重要度を表示
 print(importance_df)
 
-# # 特徴量の重要度をプロット
-# plt.figure(figsize=(12, 8))
-# plt.barh(importance_df['特徴量'], importance_df['重要度'])
-# plt.xlabel('重要度')
-# plt.ylabel('特徴量')
-# plt.title('特徴量の重要度')
-# plt.gca().invert_yaxis()
-# plt.show()
+# 特徴量の重要度をプロット
+plt.figure(figsize=(12, 8))
+plt.barh(importance_df['特徴量'], importance_df['重要度'])
+plt.xlabel('重要度')
+plt.ylabel('特徴量')
+plt.title('特徴量の重要度')
+plt.gca().invert_yaxis()
+plt.show()

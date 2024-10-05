@@ -44,7 +44,7 @@ print(f"Classification Report: \n{report}")
 print("モデルのトレーニングが完了しました")
 
 # モデルの保存
-with open('models/boat1_model_1.pkl', 'wb') as model_file:
+with open('models/boat1_model.pkl', 'wb') as model_file:
     pickle.dump(model, model_file)
 
 print("モデルが保存されました")
