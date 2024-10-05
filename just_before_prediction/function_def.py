@@ -67,19 +67,19 @@ def read_racelist_data(soup_racelist, soup_beforeinfo):
         
         # F数（フライング数）: F_number取得
         F_number_match = re.search(r'F\d', player_info_text)
-        F_number_base = F_number_match.group() if F_number_match else None  # マッチした文字列を取得、なければNone
+        F_number_base = F_number_match.group() if F_number_match else 0.0  # マッチした文字列を取得、なければNone
         F_number = int(F_number_base.replace("F", ""))
         F_number_list.append(F_number)  # F数のリストに追加
         
         # L数（出遅れ数）: L_number取得
         L_number_match = re.search(r'L\d', player_info_text)
-        L_number_base = L_number_match.group() if L_number_match else None  # マッチした文字列を取得、なければNone
+        L_number_base = L_number_match.group() if L_number_match else 0.0  # マッチした文字列を取得、なければNone
         L_number = int(L_number_base.replace("L", ""))
         L_number_list.append(L_number)  # L数のリストに追加
         
         # 平均スタートタイミング: average_ST取得
         average_ST_match = re.search(r'\d\.\d+', player_info_text)
-        average_ST = average_ST_match.group() if L_number_match else None  # マッチした文字列を取得、なければNone
+        average_ST = average_ST_match.group() if average_ST_match else 0.25  # マッチした文字列を取得、なければNone
         average_ST_list.append(float(average_ST))  # average_STのリストに追加
         
         # 全国勝率: national_winning_rate取得
