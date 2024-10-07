@@ -14,14 +14,17 @@ race_stadium = "多摩川"
 course_number_str = race_course_to_course_number[race_stadium]
 course_number_int = int(course_number_str) 
 
+# processed = "processed"
+processed = "processed_new"
+
 # 予測データが含まれる
 file_paths = [
-    f'data/processed/test_{course_number_str}_predictions_boat1.csv',
-    f'data/processed/test_{course_number_str}_predictions_boat2.csv',
-    f'data/processed/test_{course_number_str}_predictions_boat3.csv',
-    f'data/processed/test_{course_number_str}_predictions_boat4.csv',
-    f'data/processed/test_{course_number_str}_predictions_boat5.csv',
-    f'data/processed/test_{course_number_str}_predictions_boat6.csv'
+    f'data/{processed}/test_{course_number_str}_predictions_boat1.csv',
+    f'data/{processed}/test_{course_number_str}_predictions_boat2.csv',
+    f'data/{processed}/test_{course_number_str}_predictions_boat3.csv',
+    f'data/{processed}/test_{course_number_str}_predictions_boat4.csv',
+    f'data/{processed}/test_{course_number_str}_predictions_boat5.csv',
+    f'data/{processed}/test_{course_number_str}_predictions_boat6.csv'
 ]
 
 # 3連複結果の取得に必要
@@ -65,7 +68,7 @@ final_df['result'] = final_df[result_columns].apply(lambda row: '='.join([str(i+
 final_df.drop(columns=result_columns, inplace=True)
 
 output_path = f"test_{course_number_str}_predict_with_odds.csv"
-final_df.to_csv(f"data/processed/{output_path}", index=False)
+final_df.to_csv(f"data/{processed}/{output_path}", index=False)
 
 # 結果を確認
 print(final_df.head())

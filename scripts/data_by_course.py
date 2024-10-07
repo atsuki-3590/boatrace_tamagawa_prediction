@@ -5,8 +5,8 @@ from sklearn.preprocessing import LabelEncoder
 
 
 # ファイルパスを変数に格納
-raw_file_path = 'data/raw/merged_data.csv'
-processed_dir = 'data/processed/'
+raw_file_path = 'data/raw/merged_data_new.csv'
+processed_dir = 'data/processed_new/'
 
 os.makedirs(processed_dir, exist_ok=True)
 
@@ -27,7 +27,8 @@ columns_to_drop = [
     '1着_着順', '2着_着順', '3着_着順', '4着_着順', '5着_着順', '6着_着順', 
     '1着_選手名', '2着_選手名', '3着_選手名', '4着_選手名', '5着_選手名', '6着_選手名',
     '1着_進入コース', '2着_進入コース', '3着_進入コース', '4着_進入コース', '5着_進入コース', '6着_進入コース', 
-    '日次', 'レース日', '距離', '決まり手'
+    # '日次', 'レース日', 
+    '距離', '決まり手'
 ]
 
 # 指定した列を削除
