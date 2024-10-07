@@ -10,6 +10,9 @@ if project_root not in sys.path:
 
 from race_studium_data import race_course_to_course_number
 
+# processed = "processed"
+processed = "processed_new"
+
 
 def predict_with_model(boat_number):
     # データの読み込み
@@ -46,7 +49,7 @@ def predict_with_model(boat_number):
 
     # 予測結果を含んだデータの保存
     output_path = f"test_{course_number_str}_predictions_boat{boat_number}.csv"
-    data.to_csv(f"data/processed/{output_path}", index=False)
+    data.to_csv(f"data/{processed}/{output_path}", index=False)
 
     print(f"予測が完了し、結果が '{output_path}' に保存されました。")
 

@@ -15,7 +15,8 @@ def preprocess_boto_data(boat_number):
     print(f"データ前処理を開始します ({boat_number}号艇)")
 
     # ディレクトリの設定
-    processed_dir = 'data/processed/'
+    # processed_dir = 'data/processed/'
+    processed_dir = 'data/processed_new/'
     
     # ファイルパスを生成
     input_file_path = f"{processed_dir}data_boat{boat_number}.csv"

@@ -27,7 +27,8 @@ course_number_int = int(course_number_str)
 
 
 # ファイルパスの修正（バックスラッシュからスラッシュへ）
-modified_file_path = "data/processed/modified_data2.csv"
+# modified_file_path = "data/processed/modified_data2.csv"
+modified_file_path = "data/processed_new/modified_data2.csv"
 data = pd.read_csv(modified_file_path, low_memory=False)
 
 # 指定したレース場のデータのみを選択

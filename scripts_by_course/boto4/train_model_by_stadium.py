@@ -29,6 +29,7 @@ course_number_int = int(course_number_str)
 
 
 modified_file_path = f"data/processed/modified_data4.csv"
+modified_file_path = f"data/processed_new/modified_data4.csv"
 data = pd.read_csv(modified_file_path, low_memory=False)
 
 # 指定したレース場のデータのみを選択

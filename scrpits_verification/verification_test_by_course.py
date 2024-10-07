@@ -21,8 +21,11 @@ race_stadium = "多摩川"
 course_number_str = race_course_to_course_number[race_stadium]
 course_number_int = int(course_number_str) 
 
+# processed = "processed"
+processed = "processed_new"
+
 # データの読み込み
-file_path = f'data/processed/test_{course_number_str}_predict_with_odds.csv'
+file_path = f'data/{processed}/test_{course_number_str}_predict_with_odds.csv'
 df = pd.read_csv(file_path)
 
 # 逆数の積のデータフレームを作成
@@ -41,7 +44,7 @@ inverse_product_df = pd.DataFrame({
     # 'Inverse Product': [7.3] * 20 
     # 'Inverse Product': [8.0] * 20 
     # 'Inverse Product': [9.0] * 20 
-    # 'Inverse Product': [10.0] * 20 
+    'Inverse Product': [10.0] * 20 
     # 'Inverse Product': [20.0] * 20 
 })
 
