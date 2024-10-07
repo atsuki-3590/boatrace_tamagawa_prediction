@@ -8,9 +8,9 @@ import os
 import pickle
 
 
-DATE = "2024-10-05"
+DATE = "2024-10-06"
 Racenumber = "12"
-Course = "津"
+Course = "桐生"
 
 
 """
