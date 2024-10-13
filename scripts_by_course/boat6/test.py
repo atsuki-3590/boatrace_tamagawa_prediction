@@ -22,7 +22,7 @@ print("データ前処理を開始します")
 processed_dir = 'data/processed/'
 
 
-base_file_path = f"{processed_dir}data_boto2.csv"
+base_file_path = f"{processed_dir}data_boat6.csv"
 # modified_file_path = f"{processed_dir}modified_data2.csv"
 
 df = pd.read_csv(base_file_path, low_memory=False)
@@ -94,17 +94,17 @@ model.fit(X_train, y_train)
 # model.fit(X_train_res, y_train_res)
 
 
-# アンダーサンプリング
-# アンダーサンプリングのインスタンスを作成
-rus = RandomUnderSampler(random_state=42)
-# 訓練データにアンダーサンプリングを適用
-X_train_res, y_train_res = rus.fit_resample(X_train, y_train)
-# モデルの訓練
-model.fit(X_train_res, y_train_res)
+# # アンダーサンプリング
+# # アンダーサンプリングのインスタンスを作成
+# rus = RandomUnderSampler(random_state=42)
+# # 訓練データにアンダーサンプリングを適用
+# X_train_res, y_train_res = rus.fit_resample(X_train, y_train)
+# # モデルの訓練
+# model.fit(X_train_res, y_train_res)
 
 
 # カスタム閾値の設定
-custom_threshold = 0.40  # ここでカスタム閾値を設定します
+custom_threshold = 0.30  # ここでカスタム閾値を設定します
 
 # モデルの予測
 y_pred_proba = model.predict_proba(X_test)[:, 1]
@@ -122,7 +122,7 @@ print(f"Classification Report: \n{report}")
 print("モデルのトレーニングが完了しました")
 
 # モデルの保存
-with open('models/boat2_model.pkl', 'wb') as model_file:
+with open('models/boat4_model.pkl', 'wb') as model_file:
     pickle.dump(model, model_file)
 
 print("モデルが保存されました")
@@ -140,26 +140,26 @@ importance_df = importance_df.sort_values(by='重要度', ascending=False)
 # 特徴量の重要度を表示
 print(importance_df)
 
-# # 特徴量の重要度をプロット
-# plt.figure(figsize=(12, 8))
-# plt.barh(importance_df['特徴量'], importance_df['重要度'])
-# plt.xlabel('重要度')
-# plt.ylabel('特徴量')
-# plt.title('特徴量の重要度')
-# plt.gca().invert_yaxis()
-# plt.show()
+# 特徴量の重要度をプロット
+plt.figure(figsize=(12, 8))
+plt.barh(importance_df['特徴量'], importance_df['重要度'])
+plt.xlabel('重要度')
+plt.ylabel('特徴量')
+plt.title('特徴量の重要度')
+plt.gca().invert_yaxis()
+plt.show()
 
 # ROC曲線をプロットして最適な閾値を確認（任意）
 fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
 roc_auc = auc(fpr, tpr)
-# plt.figure()
+plt.figure()
 
-# plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
-# plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
-# plt.xlim([0.0, 1.0])
-# plt.ylim([0.0, 1.05])
-# plt.xlabel('偽陽性率')
-# plt.ylabel('真陽性率')
-# plt.title('2号艇勝率の特性曲線')
-# plt.legend(loc="lower right")
-# plt.show()
+plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
+plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('偽陽性率')
+plt.ylabel('真陽性率')
+plt.title('2号艇勝率の特性曲線')
+plt.legend(loc="lower right")
+plt.show()

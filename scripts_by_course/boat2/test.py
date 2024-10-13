@@ -22,7 +22,7 @@ print("データ前処理を開始します")
 processed_dir = 'data/processed/'
 
 
-base_file_path = f"{processed_dir}data_boto3.csv"
+base_file_path = f"{processed_dir}data_boat2.csv"
 # modified_file_path = f"{processed_dir}modified_data2.csv"
 
 df = pd.read_csv(base_file_path, low_memory=False)
@@ -39,7 +39,7 @@ columns_to_drop_place = [
     , '全国2連対率', '当地2連対率'
     # , '全国勝率_Zスコア', '全国2連対率_Zスコア', 'モーター2連対率_Zスコア', 'ボート2連対率_Zスコア', '当地2連対率_Zスコア', '当地勝率_Zスコア', '展示タイム_Zスコア'
     # , '全国勝率_Zスコア', '当地勝率_Zスコア'
-    # ,'全国2連対率_Zスコア', '当地2連対率_Zスコア'
+    ,'全国2連対率_Zスコア', '当地2連対率_Zスコア'
 ]
 
 
@@ -94,17 +94,17 @@ model.fit(X_train, y_train)
 # model.fit(X_train_res, y_train_res)
 
 
-# # アンダーサンプリング
-# # アンダーサンプリングのインスタンスを作成
-# rus = RandomUnderSampler(random_state=42)
-# # 訓練データにアンダーサンプリングを適用
-# X_train_res, y_train_res = rus.fit_resample(X_train, y_train)
-# # モデルの訓練
-# model.fit(X_train_res, y_train_res)
+# アンダーサンプリング
+# アンダーサンプリングのインスタンスを作成
+rus = RandomUnderSampler(random_state=42)
+# 訓練データにアンダーサンプリングを適用
+X_train_res, y_train_res = rus.fit_resample(X_train, y_train)
+# モデルの訓練
+model.fit(X_train_res, y_train_res)
 
 
 # カスタム閾値の設定
-custom_threshold = 0.60  # ここでカスタム閾値を設定します
+custom_threshold = 0.40  # ここでカスタム閾値を設定します
 
 # モデルの予測
 y_pred_proba = model.predict_proba(X_test)[:, 1]
@@ -122,7 +122,7 @@ print(f"Classification Report: \n{report}")
 print("モデルのトレーニングが完了しました")
 
 # モデルの保存
-with open('models/boat3_model.pkl', 'wb') as model_file:
+with open('models/boat2_model.pkl', 'wb') as model_file:
     pickle.dump(model, model_file)
 
 print("モデルが保存されました")

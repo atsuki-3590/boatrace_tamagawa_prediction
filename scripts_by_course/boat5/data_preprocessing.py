@@ -9,8 +9,8 @@ print("データ前処理を開始します")
 processed_dir = 'data/processed/'
 
 
-base_file_path = f"{processed_dir}data_boto1.csv"
-modified_file_path = f"{processed_dir}modified_data1.csv"
+base_file_path = f"{processed_dir}data_boat5.csv"
+modified_file_path = f"{processed_dir}modified_data5.csv"
 
 df = pd.read_csv(base_file_path, low_memory=False)
 
@@ -53,7 +53,7 @@ for column in categorical_columns:
 os.makedirs(processed_dir, exist_ok=True)
 data_filtered.to_csv(modified_file_path, index=False)
 
-print("1号艇のデータ前処理が完了しました")
+print("5号艇のデータ前処理が完了しました")
 
 
 

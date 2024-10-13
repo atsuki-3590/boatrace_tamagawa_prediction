@@ -15,7 +15,7 @@ print("データ前処理を開始します")
 
 # ファイルパスを変数に格納
 processed_dir = 'data/processed/'
-base_file_path = f"{processed_dir}data_boto1.csv"
+base_file_path = f"{processed_dir}data_boat1.csv"
 df = pd.read_csv(base_file_path, low_memory=False)
 
 # 削除する列を指定

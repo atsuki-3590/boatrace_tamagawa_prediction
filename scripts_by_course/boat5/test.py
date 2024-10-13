@@ -22,7 +22,7 @@ print("データ前処理を開始します")
 processed_dir = 'data/processed/'
 
 
-base_file_path = f"{processed_dir}data_boto5.csv"
+base_file_path = f"{processed_dir}data_boat5.csv"
 # modified_file_path = f"{processed_dir}modified_data2.csv"
 
 df = pd.read_csv(base_file_path, low_memory=False)

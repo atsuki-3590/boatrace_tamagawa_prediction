@@ -1,22 +1,29 @@
 import pandas as pd
-import configparser
 import matplotlib.pyplot as plt
 import numpy as np
-import japanize_matplotlib 
+import japanize_matplotlib
+import sys
+import os
+
+# 現在のスクリプトのディレクトリを取得
+current_dir = os.path.dirname(os.path.abspath(__file__))
+# 親ディレクトリを取得
+parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
+
+# 親ディレクトリを sys.path に追加
+if parent_dir not in sys.path:
+    sys.path.append(parent_dir)
+# 絶対インポートを使用
+from path_read_def import read_config
+
 japanize_matplotlib.japanize()
 
+
 # データの読み込み
-# ConfigParserのインスタンスを作成
-config = configparser.ConfigParser()
-# config.ini を読み込む
-config.read('config.ini', encoding='utf-8')
-# 'CSV_FILE_PATH' を取得
-try:
-    csv_file_path = config['DEFAULT']['CSV_FILE_PATH']
-except KeyError:
-    raise KeyError("設定ファイルに 'CSV_FILE_PATH' が存在しません。")
+odds_file_path = read_config("ODDS_FILE")
+
 # CSVファイルを読み込む
-df = pd.read_csv(csv_file_path)
+df = pd.read_csv(odds_file_path)
 
 
 # 逆数の積のデータフレームを作成

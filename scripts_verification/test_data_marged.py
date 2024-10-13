@@ -13,12 +13,12 @@ file_paths = [
 
 # 3連複結果の取得に必要
 result_file_paths = [
-    'data/processed/data_boto1.csv',
-    'data/processed/data_boto2.csv',
-    'data/processed/data_boto3.csv',
-    'data/processed/data_boto4.csv',
-    'data/processed/data_boto5.csv',
-    'data/processed/data_boto6.csv'
+    'data/processed/data_boat1.csv',
+    'data/processed/data_boat2.csv',
+    'data/processed/data_boat3.csv',
+    'data/processed/data_boat4.csv',
+    'data/processed/data_boat5.csv',
+    'data/processed/data_boat6.csv'
 ]
 
 # Predictions データの結合

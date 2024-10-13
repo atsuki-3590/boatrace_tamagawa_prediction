@@ -11,7 +11,7 @@ if project_root not in sys.path:
 from race_studium_data import race_course_to_course_number
 
 # データ前処理
-def preprocess_boto_data(boat_number):
+def preprocess_boat_data(boat_number):
     print(f"データ前処理を開始します ({boat_number}号艇)")
 
     # ディレクトリの設定
@@ -70,7 +70,7 @@ def preprocess_boto_data(boat_number):
 
 # すべてのボートのデータを処理する
 for i in range(1, 7):
-    preprocess_boto_data(i)
+    preprocess_boat_data(i)
 
 print("すべてのボートのデータ前処理が完了しました")
 

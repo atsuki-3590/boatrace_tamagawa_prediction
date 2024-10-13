@@ -254,22 +254,22 @@ print("データ前処理が完了しました")
 
 
 # # 1号艇のデータのみ抽出
-# boto1_df = transformed_df[transformed_df['枠'] == 1]
-# boto1_file_path = f"{processed_dir}data_boto1.csv"
+# boat1_df = transformed_df[transformed_df['枠'] == 1]
+# boat1_file_path = f"{processed_dir}data_boat1.csv"
 
 # # CSVファイルとして保存
 # transformed_df.to_csv(modified_file_path, index=False)
-# boto1_df.to_csv(boto1_file_path, index=False)
+# boat1_df.to_csv(boat1_file_path, index=False)
 
 # print("1号艇のデータを作成しました")
 
 
 for i in range(1, 7):
-    boto1_df = transformed_df[transformed_df['枠'] == i]
-    boto1_file_path = f"{processed_dir}data_boat{i}.csv"
+    boat1_df = transformed_df[transformed_df['枠'] == i]
+    boat1_file_path = f"{processed_dir}data_boat{i}.csv"
 
     # CSVファイルとして保存
     transformed_df.to_csv(modified_file_path, index=False)
-    boto1_df.to_csv(boto1_file_path, index=False)
+    boat1_df.to_csv(boat1_file_path, index=False)
 
     print(f"{i}号艇のデータを作成しました")
