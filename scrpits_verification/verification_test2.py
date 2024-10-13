@@ -1,12 +1,23 @@
 import pandas as pd
+import configparser
 import matplotlib.pyplot as plt
 import numpy as np
 import japanize_matplotlib 
 japanize_matplotlib.japanize()
 
 # データの読み込み
-file_path = 'data/processed/test_predict_with_odds.csv'
-df = pd.read_csv(file_path)
+# ConfigParserのインスタンスを作成
+config = configparser.ConfigParser()
+# config.ini を読み込む
+config.read('config.ini', encoding='utf-8')
+# 'CSV_FILE_PATH' を取得
+try:
+    csv_file_path = config['DEFAULT']['CSV_FILE_PATH']
+except KeyError:
+    raise KeyError("設定ファイルに 'CSV_FILE_PATH' が存在しません。")
+# CSVファイルを読み込む
+df = pd.read_csv(csv_file_path)
+
 
 # 逆数の積のデータフレームを作成
 inverse_product_df = pd.DataFrame({
