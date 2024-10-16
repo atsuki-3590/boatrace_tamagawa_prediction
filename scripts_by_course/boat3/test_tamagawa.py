@@ -1,6 +1,6 @@
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
-from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import RFE
 from sklearn.metrics import accuracy_score, classification_report, roc_auc_score, confusion_matrix
@@ -23,7 +23,7 @@ from path_read_def import read_config
 
 print("データ前処理を開始します")
 
-base_file_path = read_config("BOAT6_PROCESSED_DATA_FILE_05")
+base_file_path = read_config("BOAT3_PROCESSED_DATA_FILE_05")
 
 # データの読み込み
 df = pd.read_csv(base_file_path, low_memory=False)
@@ -60,8 +60,6 @@ y = data['3連複_結果']
 # 再帰的特徴量削減を適用する特徴量を指定
 columns_for_rfe = [
     '天気', '体重', 
-    # '全国勝率', 'モーター2連対率', 'ボート2連対率',
-    # '当地勝率', '展示タイム', '全国2連対率', '当地2連対率',
     '全国勝率_Zスコア', '全国2連対率_Zスコア', 'モーター2連対率_Zスコア',
     'ボート2連対率_Zスコア', '当地2連対率_Zスコア', '当地勝率_Zスコア', '展示タイム_Zスコア'
 ]
@@ -71,7 +69,6 @@ X_rfe = X[columns_for_rfe]
 
 # 訓練データとテストデータに分割
 X_train, X_test, y_train, y_test = train_test_split(X_rfe, y, test_size=0.2, shuffle=False)
-
 
 # ランダムフォレストモデルのインスタンス化
 model = RandomForestClassifier(random_state=42)
@@ -88,21 +85,9 @@ print(f"選択された特徴量: {selected_features}")
 X_train_selected = rfe.transform(X_train)
 X_test_selected = rfe.transform(X_test)
 
-# ハイパーパラメーターチューニング（グリッドサーチ）
-param_grid = {
-    'n_estimators': [100, 200, 300],
-    'max_depth': [None, 10, 20, 30],
-    'min_samples_split': [2, 5, 10],
-    'min_samples_leaf': [1, 2, 4],
-    'bootstrap': [True, False]
-}
-
-grid_search = GridSearchCV(estimator=model, param_grid=param_grid, cv=3, n_jobs=-1, verbose=2, scoring='accuracy')
-grid_search.fit(X_train_selected, y_train)
-
-# 最良モデルの取得
-best_model = grid_search.best_estimator_
-print(f"最良のハイパーパラメーター: {grid_search.best_params_}")
+# 最良のハイパーパラメーターでモデルを作成
+best_params = {'bootstrap': True, 'max_depth': 10, 'min_samples_leaf': 2, 'min_samples_split': 10, 'n_estimators': 200}
+best_model = RandomForestClassifier(**best_params, random_state=42)
 
 # 最良モデルの訓練
 best_model.fit(X_train_selected, y_train)
@@ -110,22 +95,9 @@ best_model.fit(X_train_selected, y_train)
 # モデルの予測確率
 y_pred_proba = best_model.predict_proba(X_test_selected)[:, 1]
 
-# カスタム閾値の設定（偽陰性を避けるため、閾値を低めに設定）
-custom_thresholds = [0.1 * i for i in range(1, 10)]
-for custom_threshold in custom_thresholds:
-    print(f"カスタム閾値: {custom_threshold}")
-    y_pred = (y_pred_proba >= custom_threshold).astype(int)
-
-    # モデルの評価
-    accuracy = accuracy_score(y_test, y_pred)
-    report = classification_report(y_test, y_pred)
-    auc_score = roc_auc_score(y_test, y_pred_proba)
-    conf_matrix = confusion_matrix(y_test, y_pred)
-
-    print(f"Accuracy: {accuracy}")
-    print(f"AUC Score: {auc_score}")
-    print(f"Classification Report:\n{report}")
-    print(f"Confusion Matrix:\n{conf_matrix}")
+# 指定された閾値を使用して予測
+custom_threshold = 0.5
+y_pred = (y_pred_proba >= custom_threshold).astype(int)
 
 # モデルの評価
 accuracy = accuracy_score(y_test, y_pred)
@@ -138,6 +110,15 @@ print(f"AUC Score: {auc_score}")
 print(f"Classification Report: \n{report}")
 print(f"Confusion Matrix: \n{conf_matrix}")
 print("モデルのトレーニングが完了しました")
+
+# モデルの保存
+models_path = read_config("BOAT3_TRAIN_DATA_pkl_05")
+
+with open(models_path, 'wb') as model_file:
+    pickle.dump(model, model_file)
+
+print("モデルが保存されました")
+
 
 # 特徴量の重要度を確認
 feature_importances = best_model.feature_importances_
