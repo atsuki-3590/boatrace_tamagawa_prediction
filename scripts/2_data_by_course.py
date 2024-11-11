@@ -15,12 +15,9 @@ from path_read_def import read_config
 
 
 # ファイルパスを変数に格納
-raw_file_path = 'data/raw/merged_data_new.csv'
-processed_dir = 'data/processed_new/'
+raw_file_path = read_config("DATA_MEARGED_05")
 
-os.makedirs(processed_dir, exist_ok=True)
-
-modified_file_path = f"{processed_dir}data_by_course.csv"
+modified_file_path = read_config("DATA_DATA_BYCOURSE_05")
 
 df = pd.read_csv(raw_file_path, low_memory=False)
 
@@ -256,7 +253,7 @@ for column in columns_to_add_z:
 
 
 
-os.makedirs(processed_dir, exist_ok=True)
+
 transformed_df.to_csv(modified_file_path, index=False)
 
 print("データ前処理が完了しました")
@@ -276,7 +273,8 @@ print("データ前処理が完了しました")
 
 for i in range(1, 7):
     boat1_df = transformed_df[transformed_df['枠'] == i]
-    boat1_file_path = f"{processed_dir}data_boat{i}.csv"
+    # boat1_file_path = f"{processed_dir}data_boat{i}.csv"
+    boat1_file_path = read_config(f"BOAT{i}_PROCESSED_DATA_FILE_05")
 
     # CSVファイルとして保存
     transformed_df.to_csv(modified_file_path, index=False)
