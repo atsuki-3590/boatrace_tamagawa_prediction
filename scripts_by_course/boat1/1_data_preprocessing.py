@@ -16,7 +16,7 @@ from path_read_def import read_config
 print("データ前処理を開始します")
 
 
-base_file_path = read_config("BOAT1_PROCESSED_DATA_FILE")
+base_file_path = read_config("BOAT1_MODIFIED_DATA_FILE_05")
 
 # modified_file_path = f"{processed_dir}modified_data1.csv"
 

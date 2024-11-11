@@ -1,51 +1,40 @@
-# 前処理とモデルのトレーニングを合わせてトレーニング
-# ファイルの変更は無し
-
-
-# データ前処理 
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, classification_report, roc_auc_score, roc_curve, auc
-from imblearn.over_sampling import SMOTE
-from imblearn.under_sampling import RandomUnderSampler
-import pickle
+from sklearn.feature_selection import RFE
+from sklearn.metrics import accuracy_score, classification_report, roc_auc_score, confusion_matrix
+import os
+import sys
 import matplotlib.pyplot as plt
-import japanize_matplotlib 
+import japanize_matplotlib
+import pickle
 
 japanize_matplotlib.japanize()
 
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+grandparent_dir = os.path.dirname(parent_dir)
+
+if grandparent_dir not in sys.path:
+    sys.path.append(grandparent_dir)
+
+from path_read_def import read_config
+
 print("データ前処理を開始します")
 
-# ファイルパスを変数に格納
-processed_dir = 'data/processed/'
+base_file_path = read_config("BOAT1_PROCESSED_DATA_FILE_05")
 
-
-base_file_path = f"{processed_dir}data_boat1.csv"
-# modified_file_path = f"{processed_dir}modified_data1.csv"
-
+# データの読み込み
 df = pd.read_csv(base_file_path, low_memory=False)
 
-# 削除する列を指定
+# 必ず削除する列を指定
 columns_to_drop = [
-    'レースコード', '枠', '順位', '3連複_結果', '天気', '体重'
-    , '全国勝率', '全国2連対率', 'モーター2連対率', 'ボート2連対率', '当地2連対率', '当地勝率', '全国2連対率_Zスコア', '当地2連対率_Zスコア', '展示タイム'
+    'レースコード', 'レース場', 'スタンド距離', '枠', '順位', '結果'
 ]
-
-columns_to_drop_place = [
-    'レースコード', '枠', '順位', '結果', '天気', '体重'
-    , '全国勝率', 'モーター2連対率', 'ボート2連対率', '当地勝率', '展示タイム'
-    , '全国2連対率', '当地2連対率'
-    # , '全国勝率_Zスコア', '全国2連対率_Zスコア', 'モーター2連対率_Zスコア', 'ボート2連対率_Zスコア', '当地2連対率_Zスコア', '当地勝率_Zスコア', '展示タイム_Zスコア'
-    # , '全国勝率_Zスコア', '当地勝率_Zスコア'
-    # ,'全国2連対率_Zスコア', '当地2連対率_Zスコア'
-]
-
 
 # 指定した列を削除
-# new_data = df.drop(columns=columns_to_drop)  # 勝率
-new_data = df.drop(columns=columns_to_drop_place)  # 3連対率
+new_data = df.drop(columns=columns_to_drop)
 
 # カテゴリカルデータの確認
 categorical_columns = new_data.select_dtypes(include=['object']).columns
@@ -61,78 +50,97 @@ for column in categorical_columns:
         data_filtered[column] = le.fit_transform(data_filtered[column].astype(str))
         label_encoders[column] = le
 
-
-
-print("モデルのトレーニングを開始します")
-# モデルのトレーニング
-data = data_filtered
+print("再帰的特徴量削減を開始します")
 
 # 特徴量とターゲットに分ける
-# X = data.drop(columns=['結果'])
-# y = data['結果']
+data = data_filtered
 X = data.drop(columns=['3連複_結果'])
 y = data['3連複_結果']
 
+# 再帰的特徴量削減を適用する特徴量を指定
+columns_for_rfe = [
+    '天気', '体重', 
+    # '全国勝率', 'モーター2連対率', 'ボート2連対率',
+    # '当地勝率', '展示タイム', '全国2連対率', '当地2連対率',
+    '全国勝率_Zスコア', '全国2連対率_Zスコア', 'モーター2連対率_Zスコア',
+    'ボート2連対率_Zスコア', '当地2連対率_Zスコア', '当地勝率_Zスコア', '展示タイム_Zスコア'
+]
+
+# RFEのためのデータセットを作成
+X_rfe = X[columns_for_rfe]
+
 # 訓練データとテストデータに分割
-# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)   # シャッフルなし
+X_train, X_test, y_train, y_test = train_test_split(X_rfe, y, test_size=0.2, shuffle=False)
 
-
-# モデルの訓練
+# ランダムフォレストモデルのインスタンス化
 model = RandomForestClassifier(random_state=42)
 
+# 再帰的特徴量削減（RFE）
+rfe = RFE(estimator=model, n_features_to_select=10)  # 残したい特徴量の数を指定
+rfe.fit(X_train, y_train)
 
-# # 通常
-model.fit(X_train, y_train)
+# 選ばれた特徴量のサポートとランクを表示
+selected_features = X_rfe.columns[rfe.support_]
+print(f"選択された特徴量: {selected_features}")
 
+# 選択された特徴量のみを使用してモデルを再訓練
+X_train_selected = rfe.transform(X_train)
+X_test_selected = rfe.transform(X_test)
 
-# # オーバーサンプリング
-# # SMOTEのインスタンス化
-# sm = SMOTE(random_state=42)
-# # 訓練データの再サンプリング
-# X_train_res, y_train_res = sm.fit_resample(X_train, y_train)
-# # モデルの訓練（再サンプリング後のデータを使用）
-# model.fit(X_train_res, y_train_res)
+# ハイパーパラメーターチューニング（グリッドサーチ）
+param_grid = {
+    'n_estimators': [100, 200, 300],
+    'max_depth': [None, 10, 20, 30],
+    'min_samples_split': [2, 5, 10],
+    'min_samples_leaf': [1, 2, 4],
+    'bootstrap': [True, False]
+}
 
+grid_search = GridSearchCV(estimator=model, param_grid=param_grid, cv=3, n_jobs=-1, verbose=2, scoring='accuracy')
+grid_search.fit(X_train_selected, y_train)
 
-# # アンダーサンプリング
-# # アンダーサンプリングのインスタンスを作成
-# rus = RandomUnderSampler(random_state=42)
-# # 訓練データにアンダーサンプリングを適用
-# X_train_res, y_train_res = rus.fit_resample(X_train, y_train)
-# # モデルの訓練
-# model.fit(X_train_res, y_train_res)
+# 最良モデルの取得
+best_model = grid_search.best_estimator_
+print(f"最良のハイパーパラメーター: {grid_search.best_params_}")
 
+# 最良モデルの訓練
+best_model.fit(X_train_selected, y_train)
 
-# カスタム閾値の設定
-custom_threshold = 0.45  # ここでカスタム閾値を設定します
+# モデルの予測確率
+y_pred_proba = best_model.predict_proba(X_test_selected)[:, 1]
 
-# モデルの予測
-y_pred_proba = model.predict_proba(X_test)[:, 1]
-y_pred = (y_pred_proba >= custom_threshold).astype(int)  # カスタム閾値を使用して予測
+# カスタム閾値の設定（偽陰性を避けるため、閾値を低めに設定）
+custom_thresholds = [0.1 * i for i in range(1, 10)]
+for custom_threshold in custom_thresholds:
+    print(f"カスタム閾値: {custom_threshold}")
+    y_pred = (y_pred_proba >= custom_threshold).astype(int)
+
+    # モデルの評価
+    accuracy = accuracy_score(y_test, y_pred)
+    report = classification_report(y_test, y_pred)
+    auc_score = roc_auc_score(y_test, y_pred_proba)
+    conf_matrix = confusion_matrix(y_test, y_pred)
+
+    print(f"Accuracy: {accuracy}")
+    print(f"AUC Score: {auc_score}")
+    print(f"Classification Report:\n{report}")
+    print(f"Confusion Matrix:\n{conf_matrix}")
 
 # モデルの評価
 accuracy = accuracy_score(y_test, y_pred)
 report = classification_report(y_test, y_pred)
 auc_score = roc_auc_score(y_test, y_pred_proba)
+conf_matrix = confusion_matrix(y_test, y_pred)
 
-print(f"Custom_threshold: {custom_threshold}")
 print(f"Accuracy: {accuracy}")
 print(f"AUC Score: {auc_score}")
 print(f"Classification Report: \n{report}")
+print(f"Confusion Matrix: \n{conf_matrix}")
 print("モデルのトレーニングが完了しました")
 
-# モデルの保存
-with open('models/boat1_model.pkl', 'wb') as model_file:
-    pickle.dump(model, model_file)
-
-print("モデルが保存されました")
-
-
-
 # 特徴量の重要度を確認
-feature_importances = model.feature_importances_
-features = X.columns
+feature_importances = best_model.feature_importances_
+features = selected_features
 
 # データフレームにまとめる
 importance_df = pd.DataFrame({'特徴量': features, '重要度': feature_importances})
@@ -143,31 +151,11 @@ importance_df = importance_df.sort_values(by='重要度', ascending=False)
 # 特徴量の重要度を表示
 print(importance_df)
 
-# # 特徴量の重要度をプロット
-# plt.figure(figsize=(12, 8))
-# plt.barh(importance_df['特徴量'], importance_df['重要度'])
-# plt.xlabel('重要度')
-# plt.ylabel('特徴量')
-# plt.title('特徴量の重要度')
-# plt.gca().invert_yaxis()
-# plt.show()
-
-
-
-from sklearn.metrics import roc_curve, auc
-import matplotlib.pyplot as plt
-
-y_prob = model.predict_proba(X_test)[:, 1]  # 二値分類の場合、陽性クラス（1）の確率
-fpr, tpr, thresholds = roc_curve(y_test, y_prob)
-roc_auc = auc(fpr, tpr)
-# plt.figure()
-
-# plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
-# plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
-# plt.xlim([0.0, 1.0])
-# plt.ylim([0.0, 1.05])
-# plt.xlabel('偽陽性率')
-# plt.ylabel('真陽性率')
-# plt.title('1号艇勝率の特性曲線')
-# plt.legend(loc="lower right")
-# plt.show()
+# 特徴量の重要度をプロット
+plt.figure(figsize=(12, 8))
+plt.barh(importance_df['特徴量'], importance_df['重要度'])
+plt.xlabel('重要度')
+plt.ylabel('特徴量')
+plt.title('特徴量の重要度')
+plt.gca().invert_yaxis()
+plt.show()

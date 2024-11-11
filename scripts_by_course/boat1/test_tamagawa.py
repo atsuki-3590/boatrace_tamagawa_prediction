@@ -23,7 +23,7 @@ from path_read_def import read_config
 
 print("データ前処理を開始します")
 
-base_file_path = read_config("BOAT1_PROCESSED_DATA_FILE_05")
+base_file_path = read_config("BOAT1_MODIFIED_DATA_FILE_05")
 
 # データの読み込み
 df = pd.read_csv(base_file_path, low_memory=False)

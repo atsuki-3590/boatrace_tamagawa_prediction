@@ -3,11 +3,14 @@ import sys
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 
-script_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.dirname(script_dir)
-if project_root not in sys.path:
-    sys.path.append(project_root)
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+grandparent_dir = os.path.dirname(parent_dir)
 
+if grandparent_dir not in sys.path:
+    sys.path.append(parent_dir)
+
+from path_read_def import read_config
 from race_studium_data import race_course_to_course_number
 
 # データ前処理
@@ -16,11 +19,11 @@ def preprocess_boat_data(boat_number):
 
     # ディレクトリの設定
     # processed_dir = 'data/processed/'
-    processed_dir = 'data/processed_new/'
+    # processed_dir = 'data/processed_new/'
     
     # ファイルパスを生成
-    input_file_path = f"{processed_dir}data_boat{boat_number}.csv"
-    output_file_path = f"{processed_dir}modified_data{boat_number}.csv"
+    input_file_path = read_config(f"BOAT{i}_PROCESSED_DATA_FILE_05")
+    output_file_path = read_config(f"BOAT{i}_MODIFIED_DATA_FILE_05")
 
     # データの読み込み
     df = pd.read_csv(input_file_path, low_memory=False)
