@@ -1,5 +1,6 @@
 import configparser
 from pathlib import Path
+import os
 
 def read_config(file_key, base_key='base_path', config_file='config.ini'):
     """
@@ -34,5 +35,6 @@ def read_config(file_key, base_key='base_path', config_file='config.ini'):
         raise KeyError(f"設定ファイルの '[paths]' セクションに '{file_key}' が存在しません。")
 
     # Pathオブジェクトを使用してパスを結合
-    full_path = Path(base_path) / file_name
+    # full_path = Path(base_path) / file_name
+    full_path = os.path.join(base_path, file_name)
     return full_path

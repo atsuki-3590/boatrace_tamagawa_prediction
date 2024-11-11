@@ -1,10 +1,20 @@
 # データ結合
 import pandas as pd
 import os
+import sys
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+grandparent_dir = os.path.dirname(parent_dir)
+
+if grandparent_dir not in sys.path:
+    sys.path.append(parent_dir)
+
+from path_read_def import read_config
 
 # ファイルのパス
-info_path = 'data/raw/info_new.csv'
-result_path = 'data/raw/result_new.csv'
+info_path = read_config("DATA_INFO_05")
+result_path = read_config("DATA_RESULT_05")
 
 # CSVファイルの読み込み
 info_df = pd.read_csv(info_path)
@@ -24,7 +34,7 @@ merged_df = merged_df[columns_order]
 
 # print(merged_df.head())
 
-output_path = 'data/raw/merged_data_new.csv'
+output_path = read_config("DATA_MEARGED_05")
 
 os.makedirs(os.path.dirname(output_path), exist_ok=True)
 merged_df.to_csv(output_path, index=False)
