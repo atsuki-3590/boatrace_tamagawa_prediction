@@ -26,6 +26,10 @@ result_df1 = result_df.drop(columns=columns_to_drop)
 # データフレームの結合
 merged_df = pd.merge(info_df, result_df1, on='レースコード', how='left')
 
+# 重複カラムで、info側の不要な列を削除（result側のカラムを優先する）
+columns_to_drop = [col for col in merged_df.columns if col.endswith('_info')]
+merged_df = merged_df.drop(columns=columns_to_drop)
+
 # カラムの順番を指定
 columns_order = ['レースコード', 'レース場', 'レース回', '天気', '風向', '風速', '波の高さ', '距離', '決まり手'] + [col for col in merged_df.columns if col not in ['レースコード', '天気', '風向', '風速', '波の高さ', '決まり手']]
 # columns_order = ['レースコード', 'レース場', 'レース回', '天気', '風向', '風速', '波の高さ', '距離', '決まり手'] + [col for col in merged_df.columns if col not in ['レースコード', 'レース場', 'レース回', '天気', '風向', '風速', '波の高さ', '距離', '決まり手']]

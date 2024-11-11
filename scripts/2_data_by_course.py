@@ -1,7 +1,17 @@
 # データ前処理
 import os
+import sys
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+grandparent_dir = os.path.dirname(parent_dir)
+
+if grandparent_dir not in sys.path:
+    sys.path.append(parent_dir)
+
+from path_read_def import read_config
 
 
 # ファイルパスを変数に格納
