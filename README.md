@@ -37,3 +37,8 @@
 
 ## 今後の予定
 個別のレースで予想をできるようにする（just_before_prediction）。
+
+
+## 現在
+"scripts_by_course\boat1\test_hyperparameter_05.py"でハイパーパラメーターチューニングを実行
+"scripts_by_course\boat1\memo_05.md"に記録。

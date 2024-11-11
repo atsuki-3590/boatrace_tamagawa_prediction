@@ -1,4 +1,4 @@
-カスタム閾値：0.6
+カスタム閾値：0.6 (or 0.7)
 
 
 最良のハイパーパラメーター: {'bootstrap': True, 'max_depth': 10, 'min_samples_leaf': 1, 'min_samples_split': 2, 'n_estimators': 100}
