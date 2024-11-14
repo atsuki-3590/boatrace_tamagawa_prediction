@@ -8,19 +8,22 @@ project_root = os.path.dirname(script_dir)
 if project_root not in sys.path:
     sys.path.append(project_root)
 
+from path_read_def import read_config
 from race_studium_data import race_course_to_course_number
 
 # processed = "processed"
-processed = "processed_new"
+# processed = "processed_new"
 
 
 def predict_with_model(boat_number):
     # データの読み込み
-    data = pd.read_csv(f"data/processed/modified_data{boat_number}.csv")
     
     race_stadium = "多摩川"
     course_number_str = race_course_to_course_number[race_stadium]
     course_number_int = int(course_number_str) 
+
+    data_path = read_config(f"BOAT{boat_number}_MODIFIED_DATA_FILE_{course_number_str}")
+    data = pd.read_csv(data_path)
 
     data = data[data['レース場'] == course_number_int]
     data['レース日'] = pd.to_datetime(data['レースコード'].str[:8], format='%Y%m%d')
@@ -28,8 +31,8 @@ def predict_with_model(boat_number):
 
 
     # モデルファイルと特徴量リストのパスを組み立て
-    model_path = f'models/{course_number_str}_boat{boat_number}_model.pkl'
-    features_path = f'models/{course_number_str}_trained_features_boat{boat_number}.pkl'
+    model_path = read_config(f"BOAT{boat_number}_TRAIN_DATA_pkl_{course_number_str}")
+    features_path = read_config(f"BOAT{boat_number}_TRAINED_FEATURES_pkl_{course_number_str}")
 
     # モデルの読み込み
     with open(model_path, 'rb') as model_file:
@@ -48,8 +51,8 @@ def predict_with_model(boat_number):
     data = data.drop('レース日', axis=1)
 
     # 予測結果を含んだデータの保存
-    output_path = f"test_{course_number_str}_predictions_boat{boat_number}.csv"
-    data.to_csv(f"data/{processed}/{output_path}", index=False)
+    output_path = read_config(f"BOAT{boat_number}_PREDICTION_DATA_FILE_{course_number_str}")
+    data.to_csv(output_path, index=False)
 
     print(f"予測が完了し、結果が '{output_path}' に保存されました。")
 
