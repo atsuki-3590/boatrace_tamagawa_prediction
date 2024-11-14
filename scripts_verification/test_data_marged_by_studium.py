@@ -81,6 +81,7 @@ import pandas as pd
 import sqlite3
 import sys
 import os
+from tqdm import tqdm
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(script_dir)
@@ -93,6 +94,11 @@ from race_studium_data import race_course_to_course_number
 # SQLiteデータベースの準備
 db_path = os.path.join(project_root, 'race_data.db')
 conn = sqlite3.connect(db_path)
+
+# SQLite PRAGMA設定の最適化
+conn.execute('PRAGMA cache_size = 10000;')  # キャッシュサイズの増加
+conn.execute('PRAGMA synchronous = OFF;')   # 書き込み速度の向上
+conn.execute('PRAGMA journal_mode = WAL;')  # 同時アクセスのパフォーマンス向上
 
 race_stadium = "多摩川"
 course_number_str = race_course_to_course_number[race_stadium]
@@ -109,11 +115,13 @@ file_paths = [
 ]
 
 # 各ファイルを読み込んでSQLiteに保存
-for idx, file_path in enumerate(file_paths, start=1):
-    df = pd.read_csv(file_path)
-    df = df[['レースコード', 'predict_result']].rename(columns={'predict_result': f'predict_result_{idx}'})
-    table_name = f'predictions_boat_{idx}'
-    df.to_sql(table_name, conn, if_exists='replace', index=False)
+with conn:
+    for idx, file_path in enumerate(tqdm(file_paths, desc="Saving Prediction Data", unit="file"), start=1):
+        df = pd.read_csv(file_path)
+        df = df[['レースコード', 'predict_result']].rename(columns={'predict_result': f'predict_result_{idx}'})
+        table_name = f'predictions_boat_{idx}'
+        df.to_sql(table_name, conn, if_exists='replace', index=False)
+        conn.execute(f'CREATE INDEX IF NOT EXISTS idx_{table_name}_race_code ON {table_name} (レースコード);')
 
 # 3連複結果の取得に必要なファイルの読み込みと保存
 result_file_paths = [
@@ -126,11 +134,13 @@ result_file_paths = [
 ]
 
 # 各ファイルを読み込んでSQLiteに保存
-for idx, file_path in enumerate(result_file_paths, start=1):
-    df = pd.read_csv(file_path)
-    df = df[['レースコード', '3連複_結果']].rename(columns={'3連複_結果': f'result_{idx}'})
-    table_name = f'results_boat_{idx}'
-    df.to_sql(table_name, conn, if_exists='replace', index=False)
+with conn:
+    for idx, file_path in enumerate(tqdm(result_file_paths, desc="Saving Result Data", unit="file"), start=1):
+        df = pd.read_csv(file_path)
+        df = df[['レースコード', '3連複_結果']].rename(columns={'3連複_結果': f'result_{idx}'})
+        table_name = f'results_boat_{idx}'
+        df.to_sql(table_name, conn, if_exists='replace', index=False)
+        conn.execute(f'CREATE INDEX IF NOT EXISTS idx_{table_name}_race_code ON {table_name} (レースコード);')
 
 # 予測データの結合クエリ
 predictions_query = """
@@ -196,7 +206,7 @@ odds_query = f"""
 chunk_size = 10000  # メモリに負担がかからないように1万行ずつ処理
 chunks = []
 
-for chunk in pd.read_sql_query(odds_query, conn, chunksize=chunk_size):
+for chunk in tqdm(pd.read_sql_query(odds_query, conn, chunksize=chunk_size), desc="Processing Chunks", unit="chunk"):
     # 必要な処理をチャンクごとに行う
     result_columns = [f'result_{i}' for i in range(1, 7)]
     chunk['result'] = chunk[result_columns].apply(lambda row: '='.join([str(i+1) for i, val in enumerate(row) if val == 1]), axis=1)
