@@ -185,7 +185,7 @@ final_query = f"""
 """
 
 # オッズデータの読み込みと確認
-odds_data_path = read_config("DATA_ODDS_NEW")
+odds_data_path = read_config("DATA_ODDS_05")
 odds_data = pd.read_csv(odds_data_path)
 print(odds_data.columns)  # オッズデータの列名を確認
 
@@ -202,11 +202,31 @@ odds_query = f"""
     INNER JOIN odds_data o ON f.レースコード = o.レースコード
 """
 
+# 総行数をカウントして必要なチャンク数を計算する
+count_query = f"""
+    SELECT COUNT(*)
+    FROM ({final_query}) f
+    INNER JOIN odds_data o ON f.レースコード = o.レースコード
+"""
+
+# 行数を取得する
+cursor = conn.cursor()
+cursor.execute(count_query)
+total_rows = cursor.fetchone()[0]
+
+# チャンクサイズを指定
+chunk_size = 10000
+
+# 必要なチャンク数を計算
+total_chunks = (total_rows // chunk_size) + (1 if total_rows % chunk_size != 0 else 0)
+
+# 必要なチャンク数を表示
+print(f"Total number of chunks: {total_chunks}")
+
 # チャンクサイズを指定してデータを少しずつ読み込む
-chunk_size = 10000  # メモリに負担がかからないように1万行ずつ処理
 chunks = []
 
-for chunk in tqdm(pd.read_sql_query(odds_query, conn, chunksize=chunk_size), desc="Processing Chunks", unit="chunk"):
+for chunk in tqdm(pd.read_sql_query(odds_query, conn, chunksize=chunk_size), desc="Processing Chunks", unit="chunk", total=total_chunks):
     # 必要な処理をチャンクごとに行う
     result_columns = [f'result_{i}' for i in range(1, 7)]
     chunk['result'] = chunk[result_columns].apply(lambda row: '='.join([str(i+1) for i, val in enumerate(row) if val == 1]), axis=1)
@@ -225,3 +245,4 @@ print(final_df.head())
 
 # データベース接続を閉じる
 conn.close()
+cursor.close()
