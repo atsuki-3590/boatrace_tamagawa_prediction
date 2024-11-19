@@ -20,10 +20,10 @@ japanize_matplotlib.japanize()
 
 
 # データの読み込み
-odds_file_path = read_config("ODDS_FILE")
+odds_file_path = read_config("ODDS_MEARGED_FILE_05")
 
 # CSVファイルを読み込む
-df = pd.read_csv(odds_file_path)
+df = pd.read_csv(odds_file_path, encoding='shift_jis')
 
 
 # 逆数の積のデータフレームを作成
@@ -32,17 +32,24 @@ inverse_product_df = pd.DataFrame({
         '1=2=3', '1=2=4', '1=2=5', '1=2=6', '1=3=4', '1=3=5', '1=3=6', '1=4=5', '1=4=6', '1=5=6',
         '2=3=4', '2=3=5', '2=3=6', '2=4=5', '2=4=6', '2=5=6', '3=4=5', '3=4=6', '3=5=6', '4=5=6'
     ],
+    
     # 'Inverse Product': [
     #     3.285324, 2.802188, 3.402657, 3.664400, 3.092069, 3.754656, 4.043475, 3.202501, 3.448847, 4.187885,
     #     3.961714, 4.810653, 5.180703, 4.103204, 4.418835, 5.365728, 4.527673, 4.875956, 5.920803, 5.050097
-    # ]
+    # ]  
+
+    'Inverse Product' : [value * 2 for value in [
+        3.285324, 2.802188, 3.402657, 3.664400, 3.092069, 3.754656, 4.043475, 3.202501, 3.448847, 4.187885,
+        3.961714, 4.810653, 5.180703, 4.103204, 4.418835, 5.365728, 4.527673, 4.875956, 5.920803, 5.050097
+    ]  ]
+
     # 'Inverse Product': [5.0] * 20 
     # 'Inverse Product': [6.0] * 20 
     # 'Inverse Product': [7.0] * 20 
     # 'Inverse Product': [7.3] * 20 
     # 'Inverse Product': [8.0] * 20 
     # 'Inverse Product': [9.0] * 20 
-    'Inverse Product': [10.0] * 20 
+    # 'Inverse Product': [10.0] * 20 
     # 'Inverse Product': [20.0] * 20 
 })
 

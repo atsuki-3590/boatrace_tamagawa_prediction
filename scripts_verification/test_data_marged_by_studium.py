@@ -134,6 +134,7 @@ with open(output_path, 'w') as f:
     data_frames = []
     for idx, file_path in enumerate(file_paths, start=1):
         df = pd.read_csv(file_path, usecols=['レースコード', 'predict_result'])  # 必要な列のみ読み込む
+        df = df.drop_duplicates(subset='レースコード')  # レースコードで重複を削除
         df['レースコード'] = df['レースコード'].astype('category')
         df = df[['レースコード', 'predict_result']].astype({'predict_result': 'int8'}).rename(columns={'predict_result': f'predict_result_{idx}'})
         data_frames.append(df)
@@ -144,6 +145,7 @@ with open(output_path, 'w') as f:
     result_data_frames = []
     for idx, file_path in enumerate(result_file_paths, start=1):
         df = pd.read_csv(file_path, usecols=['レースコード', '3連複_結果'])
+        df = df.drop_duplicates(subset='レースコード')  # レースコードで重複を削除
         df['レースコード'] = df['レースコード'].astype('category')
         df = df[['レースコード', '3連複_結果']].astype({'3連複_結果': 'int8'}).rename(columns={'3連複_結果': f'result_{idx}'})
         result_data_frames.append(df)
@@ -175,8 +177,3 @@ with open(output_path, 'w') as f:
 
         # 進捗を表示
         print(f"{i + chunk_size} 行まで処理完了")
-
-        # # 5行目までのデータを表示
-        # if (i + chunk_size) >= 5:
-        #     print("現在の処理結果（5行目まで）:")
-        #     print(merged_chunk.head(5))
